@@ -201,7 +201,7 @@ nav {
 }
 
 .form-group select,
-.form-group input {
+.form-group input[type="number"] {
   width: 100%;
   padding: 0.75rem 1rem;
   font-size: 1rem;
@@ -227,6 +227,161 @@ nav {
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
 }
 
+/* SEARCHABLE VEHICLE SELECT */
+.search-select {
+  position: relative;
+}
+
+.search-select input[type="text"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--gray-800);
+  transition: border-color 0.2s;
+}
+
+.search-select input[type="text"]:focus {
+  outline: none;
+  border-color: var(--green-500);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 2px solid var(--gray-200);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.search-dropdown.hidden {
+  display: none;
+}
+
+.search-dropdown li {
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.15s;
+}
+
+.search-dropdown li:hover,
+.search-dropdown li.active {
+  background: var(--green-50);
+}
+
+.search-dropdown li .vehicle-detail {
+  font-size: 0.8rem;
+  color: var(--gray-600);
+}
+
+/* KM SLIDER */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--gray-200);
+  outline: none;
+  border: none;
+  margin-top: 0.5rem;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--green-600);
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--green-600);
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--gray-600);
+  margin-top: 0.25rem;
+}
+
+/* MEAL GRID */
+.meal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.meal-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.85rem 0.5rem;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  color: var(--gray-800);
+}
+
+.meal-card:hover {
+  border-color: var(--green-400);
+  background: var(--green-50);
+}
+
+.meal-card.selected {
+  border-color: var(--green-600);
+  background: var(--green-50);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.meal-emoji {
+  font-size: 1.75rem;
+}
+
+.meal-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.meal-co2 {
+  font-size: 0.7rem;
+  color: var(--gray-600);
+}
+
 /* RESULTS */
 .results {
   max-width: 540px;
@@ -237,6 +392,29 @@ nav {
 
 .results.hidden {
   display: none;
+}
+
+/* BADGE */
+.badge-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.badge-emoji {
+  font-size: 2.5rem;
+}
+
+.badge-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gray-900);
 }
 
 .result-card {
@@ -274,7 +452,8 @@ nav {
 }
 
 .comparison h3,
-.suggestions h3 {
+.suggestions h3,
+.city-alternatives h3 {
   font-size: 1.1rem;
   margin-bottom: 1.25rem;
   color: var(--gray-900);
@@ -329,6 +508,50 @@ nav {
   color: var(--gray-600);
 }
 
+/* CITY ALTERNATIVES */
+.city-alternatives {
+  text-align: left;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+}
+
+.city-alternatives.hidden {
+  display: none;
+}
+
+.city-alternatives ul {
+  list-style: none;
+}
+
+.city-alternatives li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--gray-100);
+  font-size: 0.95rem;
+  color: var(--gray-700);
+}
+
+.city-alternatives li:last-child {
+  border-bottom: none;
+}
+
+.alt-name {
+  font-weight: 600;
+  color: var(--gray-900);
+}
+
+.alt-saving {
+  color: var(--green-700);
+  font-weight: 600;
+}
+
+.alt-cost {
+  font-size: 0.85rem;
+  color: var(--gray-600);
+}
+
 /* SUGGESTIONS */
 .suggestions {
   text-align: left;
@@ -371,6 +594,33 @@ nav {
   font-weight: 700;
 }
 
+/* WHATSAPP BUTTON */
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #25D366;
+  color: #fff;
+  padding: 0.85rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 99px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.1s;
+  margin-bottom: 1rem;
+  border: none;
+}
+
+.btn-whatsapp:hover {
+  background: #1da851;
+  transform: translateY(-1px);
+}
+
+.btn-whatsapp svg {
+  flex-shrink: 0;
+}
+
 /* FOOTER */
 footer {
   text-align: center;
@@ -400,5 +650,9 @@ footer {
 
   .bar-group {
     grid-template-columns: 70px 1fr 45px;
+  }
+
+  .meal-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 }
