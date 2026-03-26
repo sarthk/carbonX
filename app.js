@@ -855,5 +855,442 @@ function calcElecEmission() {
 }
 
 // ============================================================
-// Part 3 placeholder: flights, results, donut chart
+// Part 3: Flights, Results, Donut Chart, Badges, WhatsApp
 // ============================================================
+
+// ---------- AIRPORT / ROUTE DATA ----------
+var AIRPORTS = [
+  ["DEL", "Delhi (DEL)"],
+  ["BOM", "Mumbai (BOM)"],
+  ["BLR", "Bengaluru (BLR)"],
+  ["MAA", "Chennai (MAA)"],
+  ["CCU", "Kolkata (CCU)"],
+  ["HYD", "Hyderabad (HYD)"],
+  ["COK", "Kochi (COK)"],
+  ["AMD", "Ahmedabad (AMD)"],
+  ["GOI", "Goa (GOI)"],
+  ["JAI", "Jaipur (JAI)"],
+  ["LKO", "Lucknow (LKO)"],
+  ["PNQ", "Pune (PNQ)"],
+  ["DXB", "Dubai (DXB)"],
+  ["LHR", "London (LHR)"],
+  ["SIN", "Singapore (SIN)"],
+  ["BKK", "Bangkok (BKK)"],
+  ["JFK", "New York (JFK)"],
+  ["CDG", "Paris (CDG)"],
+  ["SYD", "Sydney (SYD)"],
+  ["NRT", "Tokyo (NRT)"]
+];
+
+// Hardcoded distances in km for key pairs (alphabetical key)
+var ROUTE_KM = {
+  "AMD-BOM": 524, "AMD-DEL": 776,
+  "BLR-BOM": 984, "BLR-CCU": 1871, "BLR-DEL": 1740, "BLR-HYD": 570,
+  "BLR-MAA": 334, "BLR-SIN": 3918,
+  "BKK-BOM": 3694, "BKK-DEL": 4551,
+  "BOM-CCU": 1657, "BOM-DEL": 1148, "BOM-DXB": 1926, "BOM-GOI": 554,
+  "BOM-HYD": 709, "BOM-LHR": 7198, "BOM-MAA": 1032, "BOM-SIN": 5036,
+  "CCU-DEL": 1305, "CCU-MAA": 1359,
+  "CDG-DEL": 6589, "COK-BOM": 1068, "COK-DEL": 2048,
+  "DEL-DXB": 2190, "DEL-GOI": 1899, "DEL-HYD": 1253, "DEL-JAI": 268,
+  "DEL-JFK": 11756, "DEL-LHR": 6715, "DEL-LKO": 510, "DEL-MAA": 1758,
+  "DEL-NRT": 5839, "DEL-PNQ": 1177, "DEL-SIN": 5985, "DEL-SYD": 10147,
+  "HYD-MAA": 625
+};
+
+function getRouteKey(a, b) {
+  return a < b ? a + "-" + b : b + "-" + a;
+}
+
+function getRouteDistance(from, to) {
+  if (from === to) return 0;
+  var key = getRouteKey(from, to);
+  return ROUTE_KM[key] || null;
+}
+
+// ICAO standard: 0.255 kg CO2 per km economy
+var KG_CO2_PER_KM = 0.255;
+
+// Hardcoded economy CO2 for key routes (kg)
+var ROUTE_CO2 = {
+  "BOM-DEL": 293, "BLR-DEL": 443, "DEL-MAA": 448, "CCU-DEL": 333,
+  "DEL-HYD": 319, "DEL-GOI": 484, "DEL-DXB": 557, "DEL-LHR": 1712,
+  "DEL-SIN": 1526, "DEL-JFK": 2998, "BOM-LHR": 1835
+};
+
+function calcFlightCO2(from, to, cls, isReturn) {
+  var key = getRouteKey(from, to);
+  var baseCO2 = ROUTE_CO2[key];
+  if (!baseCO2) {
+    var dist = getRouteDistance(from, to);
+    if (!dist) {
+      // Estimate: ~2500 km average unknown route
+      dist = 2500;
+    }
+    baseCO2 = Math.round(dist * KG_CO2_PER_KM);
+  }
+  var multiplier = 1;
+  if (cls === "business") multiplier = 2.5;
+  if (cls === "first") multiplier = 4;
+  var oneWay = Math.round(baseCO2 * multiplier);
+  return isReturn ? oneWay * 2 : oneWay;
+}
+
+var AIRLINES = [
+  "IndiGo", "Air India", "SpiceJet", "Vistara", "GoFirst",
+  "AirAsia India", "Emirates", "Qatar Airways", "Singapore Airlines",
+  "British Airways", "Lufthansa", "Other"
+];
+
+// ---------- POPULATE FLIGHT FORM ----------
+var flightFrom = document.getElementById("flight-from");
+var flightTo = document.getElementById("flight-to");
+var flightAirline = document.getElementById("flight-airline");
+var flightClass = document.getElementById("flight-class");
+var returnYes = document.getElementById("return-yes");
+var returnNo = document.getElementById("return-no");
+var addTripBtn = document.getElementById("add-trip-btn");
+var tripListEl = document.getElementById("trip-list");
+var flightTotalEl = document.getElementById("flight-total");
+var flightTotalVal = document.getElementById("flight-total-val");
+
+AIRPORTS.forEach(function (a) {
+  var o1 = document.createElement("option");
+  o1.value = a[0]; o1.textContent = a[1];
+  flightFrom.appendChild(o1);
+  var o2 = document.createElement("option");
+  o2.value = a[0]; o2.textContent = a[1];
+  flightTo.appendChild(o2);
+});
+
+AIRLINES.forEach(function (a) {
+  var opt = document.createElement("option");
+  opt.value = a; opt.textContent = a;
+  flightAirline.appendChild(opt);
+});
+
+// Return toggle
+var isReturnTrip = true;
+returnYes.addEventListener("click", function () {
+  isReturnTrip = true;
+  returnYes.classList.add("active");
+  returnNo.classList.remove("active");
+});
+returnNo.addEventListener("click", function () {
+  isReturnTrip = false;
+  returnNo.classList.add("active");
+  returnYes.classList.remove("active");
+});
+
+// Trip list
+var trips = [];
+
+function renderTrips() {
+  tripListEl.innerHTML = "";
+  var totalKg = 0;
+  trips.forEach(function (t, i) {
+    totalKg += t.co2;
+    var card = document.createElement("div");
+    card.className = "trip-card";
+    var oneWayCO2 = t.isReturn ? Math.round(t.co2 / 2) : t.co2;
+    var retLabel = t.isReturn ? " | Return" : " | One-way";
+    var co2Label = t.isReturn
+      ? oneWayCO2 + " kg each way | " + t.co2 + " kg total"
+      : t.co2 + " kg CO2";
+    card.innerHTML =
+      '<div class="trip-info">' +
+        '<div class="trip-route">' + t.from + " \u2192 " + t.to + "</div>" +
+        '<div class="trip-details">' + t.airline + " | " + t.cls + retLabel + "</div>" +
+      "</div>" +
+      '<div class="trip-co2">' + co2Label + "</div>" +
+      '<button type="button" class="trip-remove" data-idx="' + i + '">\u00D7</button>';
+    tripListEl.appendChild(card);
+  });
+  if (trips.length > 0) {
+    flightTotalVal.textContent = totalKg.toLocaleString();
+    flightTotalEl.classList.remove("hidden");
+  } else {
+    flightTotalEl.classList.add("hidden");
+  }
+}
+
+tripListEl.addEventListener("click", function (e) {
+  var btn = e.target.closest(".trip-remove");
+  if (!btn) return;
+  var idx = parseInt(btn.getAttribute("data-idx"), 10);
+  trips.splice(idx, 1);
+  renderTrips();
+});
+
+addTripBtn.addEventListener("click", function () {
+  var from = flightFrom.value;
+  var to = flightTo.value;
+  var airline = flightAirline.value;
+  var cls = flightClass.value;
+  if (!from || !to || from === to) return;
+  if (!airline) airline = "Other";
+
+  var co2 = calcFlightCO2(from, to, cls, isReturnTrip);
+  trips.push({
+    from: from, to: to, airline: airline,
+    cls: cls.charAt(0).toUpperCase() + cls.slice(1),
+    isReturn: isReturnTrip, co2: co2
+  });
+  renderTrips();
+});
+
+function calcFlightEmission() {
+  var totalKg = 0;
+  trips.forEach(function (t) { totalKg += t.co2; });
+  return totalKg / 1000; // tonnes
+}
+
+// ---------- BADGES ----------
+var BADGES = [
+  { max: 0.5, emoji: "\uD83C\uDF0D", title: "Earth Guardian" },
+  { max: 1.9, emoji: "\uD83C\uDF33", title: "Green Champion" },
+  { max: 4.0, emoji: "\uD83C\uDF31", title: "Climate Aware" },
+  { max: 8.0, emoji: "\u26A1", title: "Needs Action" },
+  { max: Infinity, emoji: "\uD83D\uDD25", title: "High Emitter" }
+];
+
+function getBadge(total) {
+  for (var i = 0; i < BADGES.length; i++) {
+    if (total <= BADGES[i].max) return BADGES[i];
+  }
+  return BADGES[BADGES.length - 1];
+}
+
+// ---------- CITY TRANSPORT ALTERNATIVES ----------
+var CITY_ALTS = [
+  { name: "Delhi Metro", co2PerKm: 0.03, costLabel: "\u20B940/day" },
+  { name: "DTC Electric Bus", co2PerKm: 0.02, costLabel: "\u20B925/day" },
+  { name: "Ola Electric Scooter", co2PerKm: 0.005, costLabel: null }
+];
+
+function getCityAlternatives() {
+  if (!selectedVariant) return [];
+  var fuel = selectedVariant[2];
+  if (fuel === "walk" || fuel === "public" || fuel === "auto" || fuel === "erickshaw") return [];
+  var dailyKm = parseInt(kmSlider.value, 10) || 0;
+  var userTonnes = calcCommuteEmission();
+
+  return CITY_ALTS.map(function (alt) {
+    var altTonnes = (dailyKm * alt.co2PerKm * 365) / 1000;
+    return { name: alt.name, saving: userTonnes - altTonnes, costLabel: alt.costLabel };
+  }).filter(function (a) { return a.saving > 0.01; });
+}
+
+// ---------- SUGGESTIONS ----------
+var SUGGESTIONS = {
+  transport: [
+    "Switch to public transport or carpooling \u2014 it can cut your commute emissions by up to 75%.",
+    "Consider an electric vehicle for your daily commute \u2014 EVs produce zero direct emissions.",
+    "Work from home 1\u20132 days a week to reduce your commute footprint significantly."
+  ],
+  food: [
+    "Try going meat-free 2\u20133 days a week \u2014 even small dietary shifts can save over 0.5 tonnes CO2 a year.",
+    "Switching to more plant-based meals and reducing dairy can lower your food footprint significantly.",
+    "Buy local and seasonal produce to cut emissions from food transport."
+  ],
+  electricity: [
+    "Explore switching to a renewable energy provider \u2014 it's one of the highest-impact changes you can make at home.",
+    "Switch to LED lighting and 5-star rated appliances to cut your electricity consumption by 20\u201330%.",
+    "Consider rooftop solar \u2014 it can eliminate most of your home electricity emissions."
+  ],
+  flights: [
+    "Reducing one long-haul flight a year saves roughly 1\u20132 tonnes CO2. Consider trains for shorter trips.",
+    "Fly economy class \u2014 business class has 2.5x the carbon footprint per seat.",
+    "Offset your flights through verified carbon offset programmes like Gold Standard."
+  ]
+};
+
+function getTopSuggestions(categories) {
+  // categories sorted biggest first: [{name, val}]
+  var tips = [];
+  for (var i = 0; i < categories.length && tips.length < 3; i++) {
+    var cat = categories[i].name;
+    var pool = SUGGESTIONS[cat];
+    if (pool && categories[i].val > 0) {
+      tips.push(pool[0]);
+    }
+  }
+  // Fill with secondary tips
+  for (var j = 0; j < categories.length && tips.length < 3; j++) {
+    var cat2 = categories[j].name;
+    var pool2 = SUGGESTIONS[cat2];
+    if (pool2 && pool2[1] && tips.indexOf(pool2[1]) === -1) {
+      tips.push(pool2[1]);
+    }
+  }
+  return tips.slice(0, 3);
+}
+
+// ---------- DONUT CHART ----------
+var DONUT_COLORS = ["#16a34a", "#f59e0b", "#3b82f6", "#8b5cf6"];
+
+function drawDonut(canvas, segments) {
+  var ctx = canvas.getContext("2d");
+  var W = canvas.width;
+  var H = canvas.height;
+  var cx = W / 2;
+  var cy = H / 2;
+  var outerR = Math.min(cx, cy) - 4;
+  var innerR = outerR * 0.55;
+
+  ctx.clearRect(0, 0, W, H);
+
+  var total = 0;
+  segments.forEach(function (s) { total += s.val; });
+  if (total === 0) return;
+
+  var startAngle = -Math.PI / 2;
+  segments.forEach(function (s, i) {
+    var sliceAngle = (s.val / total) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, outerR, startAngle, startAngle + sliceAngle);
+    ctx.arc(cx, cy, innerR, startAngle + sliceAngle, startAngle, true);
+    ctx.closePath();
+    ctx.fillStyle = DONUT_COLORS[i % DONUT_COLORS.length];
+    ctx.fill();
+    startAngle += sliceAngle;
+  });
+
+  // Center text
+  ctx.fillStyle = "#1f2937";
+  ctx.font = "bold 1.1rem -apple-system, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(total.toFixed(1) + "t", cx, cy);
+}
+
+// ---------- RESULTS DOM ----------
+var form = document.getElementById("carbon-form");
+var calculatorSection = document.querySelector(".calculator");
+var resultsSection = document.getElementById("results");
+var footprintNumber = document.getElementById("footprint-number");
+var barYou = document.getElementById("bar-you");
+var barYouVal = document.getElementById("bar-you-val");
+var suggestionsList = document.getElementById("suggestions-list");
+var recalculateBtn = document.getElementById("recalculate");
+var badgeEmoji = document.getElementById("badge-emoji");
+var badgeTitle = document.getElementById("badge-title");
+var cityAltSection = document.getElementById("city-alternatives");
+var altList = document.getElementById("alternatives-list");
+var whatsappBtn = document.getElementById("whatsapp-btn");
+var donutCanvas = document.getElementById("donut-chart");
+var breakdownLegend = document.getElementById("breakdown-legend");
+
+var GLOBAL_AVG = 4.0;
+var INDIA_AVG = 1.9;
+var MAX_BAR = 10;
+
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  // Calculate all four categories
+  var transport = calcCommuteEmission();
+  var food = calcMealEmission();
+  var electricity = calcElecEmission();
+  var flights = calcFlightEmission();
+  var total = transport + food + electricity + flights;
+
+  // Badge
+  var badge = getBadge(total);
+  badgeEmoji.textContent = badge.emoji;
+  badgeTitle.textContent = badge.title;
+
+  // Footprint number
+  footprintNumber.textContent = total.toFixed(1);
+
+  // Comparison bar
+  var youPercent = Math.min((total / MAX_BAR) * 100, 100);
+  barYou.style.width = youPercent + "%";
+  barYouVal.textContent = total.toFixed(1) + "t";
+
+  if (total <= INDIA_AVG) {
+    barYou.style.background = "var(--green-400)";
+  } else if (total <= GLOBAL_AVG) {
+    barYou.style.background = "var(--green-500)";
+  } else {
+    barYou.style.background = "#f59e0b";
+  }
+
+  // Donut chart
+  var segments = [
+    { label: "\uD83D\uDE97 Transport", val: transport, color: DONUT_COLORS[0] },
+    { label: "\uD83C\uDF7D\uFE0F Food", val: food, color: DONUT_COLORS[1] },
+    { label: "\u26A1 Electricity", val: electricity, color: DONUT_COLORS[2] },
+    { label: "\u2708\uFE0F Flights", val: flights, color: DONUT_COLORS[3] }
+  ];
+  drawDonut(donutCanvas, segments);
+
+  // Legend
+  breakdownLegend.innerHTML = "";
+  segments.forEach(function (s, i) {
+    var pct = total > 0 ? Math.round((s.val / total) * 100) : 0;
+    var li = document.createElement("li");
+    li.innerHTML =
+      '<span class="legend-dot" style="background:' + DONUT_COLORS[i] + '"></span>' +
+      '<span>' + s.label + '</span>' +
+      '<span class="legend-val">' + s.val.toFixed(2) + 't</span>' +
+      '<span class="legend-pct">' + pct + '%</span>';
+    breakdownLegend.appendChild(li);
+  });
+
+  // City alternatives
+  var alternatives = getCityAlternatives();
+  if (alternatives.length > 0) {
+    altList.innerHTML = "";
+    alternatives.forEach(function (alt) {
+      var li = document.createElement("li");
+      var costStr = alt.costLabel
+        ? ' <span class="alt-cost">(' + alt.costLabel + ")</span>"
+        : "";
+      li.innerHTML =
+        '<span class="alt-name">' + alt.name + "</span>: saves " +
+        '<span class="alt-saving">' + alt.saving.toFixed(2) + " tonnes/year</span>" +
+        costStr;
+      altList.appendChild(li);
+    });
+    cityAltSection.classList.remove("hidden");
+  } else {
+    cityAltSection.classList.add("hidden");
+  }
+
+  // Suggestions — target biggest category first
+  var sorted = [
+    { name: "transport", val: transport },
+    { name: "food", val: food },
+    { name: "electricity", val: electricity },
+    { name: "flights", val: flights }
+  ].sort(function (a, b) { return b.val - a.val; });
+
+  var tips = getTopSuggestions(sorted);
+  suggestionsList.innerHTML = "";
+  tips.forEach(function (tip, i) {
+    var li = document.createElement("li");
+    li.innerHTML =
+      '<span class="suggestion-icon">' + (i + 1) + "</span><span>" + tip + "</span>";
+    suggestionsList.appendChild(li);
+  });
+
+  // WhatsApp
+  var shareText =
+    "I just calculated my carbon footprint on CarbonX and it's " +
+    total.toFixed(1) + " tonnes/year! " + badge.emoji +
+    " Calculate yours: sarthk.github.io/carbonX";
+  whatsappBtn.href = "https://wa.me/?text=" + encodeURIComponent(shareText);
+
+  // Show results
+  calculatorSection.style.display = "none";
+  resultsSection.classList.remove("hidden");
+  resultsSection.scrollIntoView({ behavior: "smooth" });
+});
+
+recalculateBtn.addEventListener("click", function () {
+  resultsSection.classList.add("hidden");
+  cityAltSection.classList.add("hidden");
+  calculatorSection.style.display = "block";
+  calculatorSection.scrollIntoView({ behavior: "smooth" });
+});
