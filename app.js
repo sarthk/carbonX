@@ -1,4 +1,98 @@
 // ============================================================
+// CarbonX App — Homepage: Leaf Particles & Mobile Menu
+// ============================================================
+
+// Mobile hamburger menu
+(function () {
+  var hamburger = document.getElementById("nav-hamburger");
+  var mobileMenu = document.getElementById("mobile-menu");
+  if (!hamburger || !mobileMenu) return;
+
+  hamburger.addEventListener("click", function () {
+    mobileMenu.classList.toggle("hidden");
+  });
+
+  // Close menu on link click
+  var links = mobileMenu.querySelectorAll(".mobile-link");
+  links.forEach(function (link) {
+    link.addEventListener("click", function () {
+      mobileMenu.classList.add("hidden");
+    });
+  });
+})();
+
+// Floating leaf particles animation
+(function () {
+  var canvas = document.getElementById("leaf-canvas");
+  if (!canvas) return;
+  var ctx = canvas.getContext("2d");
+
+  function resize() {
+    var hero = canvas.parentElement;
+    canvas.width = hero.offsetWidth;
+    canvas.height = hero.offsetHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  var leaves = [];
+  var LEAF_COUNT = 18;
+  var COLORS = ["#22c55e", "#4ade80", "#86efac", "#16a34a", "#bbf7d0"];
+
+  function createLeaf() {
+    return {
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 40,
+      size: 6 + Math.random() * 10,
+      speedY: 0.3 + Math.random() * 0.6,
+      speedX: (Math.random() - 0.5) * 0.5,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.02,
+      opacity: 0.15 + Math.random() * 0.25,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)]
+    };
+  }
+
+  for (var i = 0; i < LEAF_COUNT; i++) {
+    var l = createLeaf();
+    l.y = Math.random() * canvas.height;
+    leaves.push(l);
+  }
+
+  function drawLeaf(l) {
+    ctx.save();
+    ctx.translate(l.x, l.y);
+    ctx.rotate(l.rotation);
+    ctx.globalAlpha = l.opacity;
+    ctx.fillStyle = l.color;
+    ctx.beginPath();
+    // Simple leaf shape
+    ctx.moveTo(0, -l.size);
+    ctx.bezierCurveTo(l.size * 0.6, -l.size * 0.6, l.size * 0.6, l.size * 0.3, 0, l.size);
+    ctx.bezierCurveTo(-l.size * 0.6, l.size * 0.3, -l.size * 0.6, -l.size * 0.6, 0, -l.size);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var j = 0; j < leaves.length; j++) {
+      var l = leaves[j];
+      l.y += l.speedY;
+      l.x += l.speedX + Math.sin(l.y * 0.01) * 0.3;
+      l.rotation += l.rotSpeed;
+
+      if (l.y > canvas.height + 20) {
+        leaves[j] = createLeaf();
+      }
+      drawLeaf(l);
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// ============================================================
 // CarbonX App — Part 1: Vehicle Database & Cascade Dropdowns
 // ============================================================
 
