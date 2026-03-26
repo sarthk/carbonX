@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarbonX - Track Your Carbon Footprint</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">Carbon<span>X</span></div>
+      <a href="#calculator" class="nav-cta">Calculate Now</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <h1>Know Your <span>Carbon Footprint</span></h1>
+      <p>Understanding your impact is the first step to a greener future. CarbonX estimates your annual CO2 emissions based on your lifestyle and gives you personalised tips to reduce them.</p>
+      <a href="#calculator" class="btn">Get Started</a>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feature-card">
+      <div class="feature-icon">&#127811;</div>
+      <h3>Quick Estimate</h3>
+      <p>Answer 4 simple questions and get your carbon footprint in seconds.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">&#128202;</div>
+      <h3>Compare</h3>
+      <p>See how you stack up against global and national averages.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">&#128161;</div>
+      <h3>Take Action</h3>
+      <p>Get personalised suggestions to lower your footprint today.</p>
+    </div>
+  </section>
+
+  <section class="calculator" id="calculator">
+    <h2>Calculate Your Footprint</h2>
+    <form id="carbon-form">
+      <div class="form-group">
+        <label for="commute">Daily Commute</label>
+        <select id="commute" required>
+          <option value="" disabled selected>Select your commute type</option>
+          <option value="car">Car</option>
+          <option value="bike">Bike / Motorcycle</option>
+          <option value="public">Public Transport</option>
+          <option value="walk">Walk / Cycle</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="diet">Diet Type</label>
+        <select id="diet" required>
+          <option value="" disabled selected>Select your diet</option>
+          <option value="non-veg">Non-Vegetarian</option>
+          <option value="vegetarian">Vegetarian</option>
+          <option value="vegan">Vegan</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="energy">Home Energy Source</label>
+        <select id="energy" required>
+          <option value="" disabled selected>Select your energy source</option>
+          <option value="coal">Coal / Fossil Fuels</option>
+          <option value="mixed">Mixed</option>
+          <option value="renewable">Renewable</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="flights">Flights Per Year</label>
+        <input type="number" id="flights" min="0" max="100" placeholder="e.g. 4" required>
+      </div>
+
+      <button type="submit" class="btn btn-full">Calculate My Footprint</button>
+    </form>
+  </section>
+
+  <section class="results hidden" id="results">
+    <h2>Your Results</h2>
+    <div class="result-card">
+      <div class="footprint-value">
+        <span id="footprint-number">0</span>
+        <small>tonnes CO2 / year</small>
+      </div>
+    </div>
+
+    <div class="comparison">
+      <h3>How You Compare</h3>
+      <div class="bars">
+        <div class="bar-group">
+          <label>You</label>
+          <div class="bar-track"><div class="bar bar-you" id="bar-you"></div></div>
+          <span class="bar-value" id="bar-you-val"></span>
+        </div>
+        <div class="bar-group">
+          <label>India Avg</label>
+          <div class="bar-track"><div class="bar bar-india"></div></div>
+          <span class="bar-value">1.9t</span>
+        </div>
+        <div class="bar-group">
+          <label>Global Avg</label>
+          <div class="bar-track"><div class="bar bar-global"></div></div>
+          <span class="bar-value">4.0t</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="suggestions">
+      <h3>Top Tips to Reduce Your Footprint</h3>
+      <ul id="suggestions-list"></ul>
+    </div>
+
+    <button class="btn btn-outline" id="recalculate">Recalculate</button>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 CarbonX. Built for a greener planet.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
