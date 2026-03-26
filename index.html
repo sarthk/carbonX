@@ -10,33 +10,108 @@
   <header>
     <nav>
       <div class="logo">Carbon<span>X</span></div>
+      <div class="nav-links">
+        <a href="#home" class="nav-link">Home</a>
+        <a href="#calculator" class="nav-link">Calculator</a>
+        <a href="#learn" class="nav-link">Learn</a>
+        <a href="#about" class="nav-link">About</a>
+      </div>
       <a href="#calculator" class="nav-cta">Calculate Now</a>
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </nav>
+    <div class="mobile-menu hidden" id="mobile-menu">
+      <a href="#home" class="mobile-link">Home</a>
+      <a href="#calculator" class="mobile-link">Calculator</a>
+      <a href="#learn" class="mobile-link">Learn</a>
+      <a href="#about" class="mobile-link">About</a>
+    </div>
   </header>
 
+  <!-- HERO -->
   <section class="hero" id="home">
+    <canvas class="leaf-canvas" id="leaf-canvas"></canvas>
     <div class="hero-content">
-      <h1>Know Your <span>Carbon Footprint</span></h1>
-      <p>Understanding your impact is the first step to a greener future. CarbonX estimates your annual CO2 emissions based on your lifestyle and gives you personalised tips to reduce them.</p>
-      <a href="#calculator" class="btn">Get Started</a>
+      <h1>India emits <span>2.9 billion tonnes</span> of CO2 every year.<br>What's yours?</h1>
+      <p>CarbonX gives every Indian a personalised carbon footprint in 2 minutes</p>
+      <div class="hero-buttons">
+        <a href="#calculator" class="btn">Calculate Mine</a>
+        <a href="#learn" class="btn btn-outline btn-outline-light">Learn More</a>
+      </div>
     </div>
   </section>
 
-  <section class="features">
-    <div class="feature-card">
-      <div class="feature-icon">&#127811;</div>
-      <h3>Quick Estimate</h3>
-      <p>Answer a few simple questions and get your carbon footprint in seconds.</p>
+  <!-- IMPACT NUMBERS -->
+  <section class="impact-bar">
+    <div class="impact-item">
+      <span class="impact-number">2.9B</span>
+      <span class="impact-label">tonnes</span>
+      <span class="impact-desc">India's annual CO2</span>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">&#128202;</div>
-      <h3>Compare</h3>
-      <p>See how you stack up against global and national averages.</p>
+    <div class="impact-item">
+      <span class="impact-number">1.9</span>
+      <span class="impact-label">tonnes</span>
+      <span class="impact-desc">Average Indian's footprint</span>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">&#128161;</div>
-      <h3>Take Action</h3>
-      <p>Get personalised suggestions to lower your footprint today.</p>
+    <div class="impact-item">
+      <span class="impact-number">263</span>
+      <span class="impact-label">vehicles</span>
+      <span class="impact-desc">In our database</span>
+    </div>
+    <div class="impact-item">
+      <span class="impact-number">24</span>
+      <span class="impact-label">states</span>
+      <span class="impact-desc">Covered</span>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works" id="about">
+    <h2>How It Works</h2>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>Tell Us Your Lifestyle</h3>
+        <p>Your vehicle, daily meals, electricity usage, and flights. Takes just 2 minutes.</p>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>Get Your Carbon Score</h3>
+        <p>We calculate your annual CO2 footprint and compare it to Indian and global averages.</p>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>Take Action</h3>
+        <p>Get personalised tips targeting your biggest emission sources. Share your score.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY IT MATTERS -->
+  <section class="why-matters" id="learn">
+    <h2>Why It Matters</h2>
+    <div class="matters-grid">
+      <div class="matters-card">
+        <div class="matters-icon">&#127987;&#65039;</div>
+        <h3>Air Quality Crisis</h3>
+        <p>14 of the world's 20 most polluted cities are in India. Delhi's AQI regularly crosses 400. The air you breathe is directly linked to fossil fuel emissions from transport, industry, and power generation.</p>
+      </div>
+      <div class="matters-card">
+        <div class="matters-icon">&#127777;&#65039;</div>
+        <h3>Climate Impact on India</h3>
+        <p>India faces extreme heatwaves exceeding 50&#176;C, erratic monsoons causing both floods and droughts, and rising sea levels threatening coastal cities. By 2050, climate change could cost India 2.8% of GDP annually.</p>
+      </div>
+      <div class="matters-card">
+        <div class="matters-icon">&#9994;</div>
+        <h3>Individuals Can Make a Difference</h3>
+        <p>If every Indian household switched to LED lights, we'd save 40 billion kWh/year. Choosing public transport over a car for 10 km daily saves 0.8 tonnes CO2/year. Small changes, multiplied by 1.4 billion, are massive.</p>
+      </div>
+    </div>
+    <div class="matters-cta">
+      <a href="#calculator" class="btn">Calculate Your Footprint Now</a>
     </div>
   </section>
 
