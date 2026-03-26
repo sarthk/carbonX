@@ -26,7 +26,7 @@
     <div class="feature-card">
       <div class="feature-icon">&#127811;</div>
       <h3>Quick Estimate</h3>
-      <p>Answer 4 simple questions and get your carbon footprint in seconds.</p>
+      <p>Answer a few simple questions and get your carbon footprint in seconds.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon">&#128202;</div>
@@ -43,25 +43,65 @@
   <section class="calculator" id="calculator">
     <h2>Calculate Your Footprint</h2>
     <form id="carbon-form">
+
       <div class="form-group">
-        <label for="commute">Daily Commute</label>
-        <select id="commute" required>
-          <option value="" disabled selected>Select your commute type</option>
-          <option value="car">Car</option>
-          <option value="bike">Bike / Motorcycle</option>
-          <option value="public">Public Transport</option>
-          <option value="walk">Walk / Cycle</option>
-        </select>
+        <label for="vehicle">Your Vehicle / Commute</label>
+        <div class="search-select" id="vehicle-search">
+          <input type="text" id="vehicle-input" placeholder="Search car, bike, or commute type..." autocomplete="off">
+          <ul class="search-dropdown hidden" id="vehicle-dropdown"></ul>
+          <input type="hidden" id="vehicle" required>
+        </div>
+      </div>
+
+      <div class="form-group" id="km-group">
+        <label for="daily-km">Daily Distance: <span id="km-value">10</span> km</label>
+        <input type="range" id="daily-km" min="1" max="50" value="10" class="slider">
+        <div class="slider-labels">
+          <span>1 km</span>
+          <span>50 km</span>
+        </div>
       </div>
 
       <div class="form-group">
-        <label for="diet">Diet Type</label>
-        <select id="diet" required>
-          <option value="" disabled selected>Select your diet</option>
-          <option value="non-veg">Non-Vegetarian</option>
-          <option value="vegetarian">Vegetarian</option>
-          <option value="vegan">Vegan</option>
-        </select>
+        <label>Typical Daily Meal</label>
+        <div class="meal-grid" id="meal-grid">
+          <button type="button" class="meal-card" data-meal="chicken-biryani">
+            <span class="meal-emoji">&#127835;</span>
+            <span class="meal-name">Chicken Biryani</span>
+            <span class="meal-co2">3.5 kg CO2</span>
+          </button>
+          <button type="button" class="meal-card" data-meal="mutton-curry">
+            <span class="meal-emoji">&#127830;</span>
+            <span class="meal-name">Mutton Curry</span>
+            <span class="meal-co2">5.0 kg CO2</span>
+          </button>
+          <button type="button" class="meal-card" data-meal="dal-tadka">
+            <span class="meal-emoji">&#127858;</span>
+            <span class="meal-name">Dal Tadka</span>
+            <span class="meal-co2">0.4 kg CO2</span>
+          </button>
+          <button type="button" class="meal-card" data-meal="paneer-butter-masala">
+            <span class="meal-emoji">&#129472;</span>
+            <span class="meal-name">Paneer Butter Masala</span>
+            <span class="meal-co2">1.1 kg CO2</span>
+          </button>
+          <button type="button" class="meal-card" data-meal="rajma-chawal">
+            <span class="meal-emoji">&#127834;</span>
+            <span class="meal-name">Rajma Chawal</span>
+            <span class="meal-co2">0.6 kg CO2</span>
+          </button>
+          <button type="button" class="meal-card" data-meal="egg-curry">
+            <span class="meal-emoji">&#129370;</span>
+            <span class="meal-name">Egg Curry</span>
+            <span class="meal-co2">1.2 kg CO2</span>
+          </button>
+          <button type="button" class="meal-card" data-meal="veg-thali">
+            <span class="meal-emoji">&#127869;</span>
+            <span class="meal-name">Veg Thali</span>
+            <span class="meal-co2">0.5 kg CO2</span>
+          </button>
+        </div>
+        <input type="hidden" id="meal" required>
       </div>
 
       <div class="form-group">
@@ -84,7 +124,11 @@
   </section>
 
   <section class="results hidden" id="results">
-    <h2>Your Results</h2>
+    <div class="badge-card" id="badge-card">
+      <span class="badge-emoji" id="badge-emoji"></span>
+      <span class="badge-title" id="badge-title"></span>
+    </div>
+
     <div class="result-card">
       <div class="footprint-value">
         <span id="footprint-number">0</span>
@@ -113,16 +157,26 @@
       </div>
     </div>
 
+    <div class="city-alternatives hidden" id="city-alternatives">
+      <h3>Greener Options in Your City</h3>
+      <ul id="alternatives-list"></ul>
+    </div>
+
     <div class="suggestions">
       <h3>Top Tips to Reduce Your Footprint</h3>
       <ul id="suggestions-list"></ul>
     </div>
 
+    <a class="btn btn-whatsapp" id="whatsapp-btn" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Share on WhatsApp
+    </a>
+
     <button class="btn btn-outline" id="recalculate">Recalculate</button>
   </section>
 
   <footer>
-    <p>&copy; 2026 CarbonX. Built for a greener planet.</p>
+    <p>Built by Sarthak Singh | CarbonX 2026</p>
   </footer>
 
   <script src="app.js"></script>
