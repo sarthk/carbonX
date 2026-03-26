@@ -674,14 +674,186 @@ function calcCommuteEmission() {
 }
 
 // ============================================================
-// Part 2 & 3 will add: meals, electricity, flights, results
+// Part 2: Meals & Electricity
 // ============================================================
-// Temporary: expose globals for parts 2 & 3
-window.CX = {
-  EF: EF,
-  DB: DB,
-  selectedVariant: function () { return selectedVariant; },
-  getEffectiveMileage: getEffectiveMileage,
-  calcCommuteEmission: calcCommuteEmission,
-  kmSlider: kmSlider
+
+// ---------- MEAL DATA ----------
+var MEAL_OPTIONS = [
+  ["", "Select meal", 0],
+  ["skip", "Skip this meal \u2014 0 kg CO2", 0],
+  ["poha", "Poha / Upma / Idli (veg breakfast) \u2014 0.3 kg CO2", 0.3],
+  ["paratha", "Paratha with butter \u2014 0.5 kg CO2", 0.5],
+  ["eggs", "Eggs (2) \u2014 0.6 kg CO2", 0.6],
+  ["bread-omelette", "Bread omelette \u2014 0.7 kg CO2", 0.7],
+  ["dal-rice", "Dal tadka + rice \u2014 0.4 kg CO2", 0.4],
+  ["rajma", "Rajma chawal \u2014 0.6 kg CO2", 0.6],
+  ["paneer", "Paneer butter masala + roti \u2014 1.1 kg CO2", 1.1],
+  ["chole", "Chole bhature \u2014 0.8 kg CO2", 0.8],
+  ["chicken-curry", "Chicken curry + rice \u2014 2.8 kg CO2", 2.8],
+  ["chicken-biryani", "Chicken biryani \u2014 3.5 kg CO2", 3.5],
+  ["mutton", "Mutton curry + rice \u2014 5.0 kg CO2", 5.0],
+  ["fish", "Fish curry + rice \u2014 1.8 kg CO2", 1.8],
+  ["veg-thali", "Veg thali (full) \u2014 0.5 kg CO2", 0.5],
+  ["nonveg-thali", "Non-veg thali (full) \u2014 2.5 kg CO2", 2.5],
+  ["fastfood", "Fast food (burger/pizza) \u2014 2.0 kg CO2", 2.0]
+];
+
+// Build a lookup: id → co2
+var MEAL_CO2 = {};
+MEAL_OPTIONS.forEach(function (m) { MEAL_CO2[m[0]] = m[2]; });
+
+// Populate 4 meal dropdowns
+var mealSelects = document.querySelectorAll(".meal-select");
+mealSelects.forEach(function (sel) {
+  MEAL_OPTIONS.forEach(function (m) {
+    var opt = document.createElement("option");
+    opt.value = m[0];
+    opt.textContent = m[1];
+    if (m[0] === "") { opt.disabled = true; opt.selected = true; }
+    sel.appendChild(opt);
+  });
+});
+
+var mealDailyTotal = document.getElementById("meal-daily-total");
+
+function updateMealTotal() {
+  var total = 0;
+  mealSelects.forEach(function (sel) {
+    total += (MEAL_CO2[sel.value] || 0);
+  });
+  mealDailyTotal.textContent = total.toFixed(1);
+  return total;
+}
+
+mealSelects.forEach(function (sel) {
+  sel.addEventListener("change", updateMealTotal);
+});
+
+// Calculate annual meal emission in tonnes
+function calcMealEmission() {
+  var dailyKg = updateMealTotal();
+  return (dailyKg * 365) / 1000;
+}
+
+// ---------- ELECTRICITY DATA ----------
+
+// State → emission factor (kg CO2 per kWh)
+var STATE_EF = {
+  "Delhi": 0.82,
+  "Maharashtra": 0.72,
+  "Karnataka": 0.61,
+  "Tamil Nadu": 0.78,
+  "Uttar Pradesh": 0.88,
+  "Gujarat": 0.76,
+  "Rajasthan": 0.84,
+  "West Bengal": 0.90,
+  "Telangana": 0.74,
+  "Andhra Pradesh": 0.72,
+  "Kerala": 0.40,
+  "Punjab": 0.80,
+  "Haryana": 0.83,
+  "Madhya Pradesh": 0.86,
+  "Bihar": 0.89,
+  "Odisha": 0.88,
+  "Jharkhand": 0.91,
+  "Chhattisgarh": 0.92,
+  "Assam": 0.78,
+  "Uttarakhand": 0.50,
+  "Himachal Pradesh": 0.30,
+  "Goa": 0.75,
+  "Jammu & Kashmir": 0.55,
+  "Other": 0.82
 };
+
+// State → providers list
+var STATE_PROVIDERS = {
+  "Delhi": ["Tata Power DDL", "BSES Rajdhani", "BSES Yamuna", "NDPL"],
+  "Maharashtra": ["Tata Power Mumbai", "MSEDCL", "Adani Electricity"],
+  "Karnataka": ["BESCOM", "HESCOM", "GESCOM", "CESCOM"],
+  "Tamil Nadu": ["TNEB (TANGEDCO)"],
+  "Uttar Pradesh": ["UPPCL", "PVVNL", "DVVNL", "MVVNL"],
+  "Gujarat": ["UGVCL", "DGVCL", "MGVCL", "PGVCL", "Torrent Power"],
+  "Rajasthan": ["JVVNL", "AVVNL", "JdVVNL"],
+  "West Bengal": ["WBSEDCL", "CESC Kolkata"],
+  "Telangana": ["TSSPDCL", "TSNPDCL"],
+  "Andhra Pradesh": ["APSPDCL", "APEPDCL"],
+  "Kerala": ["KSEB"],
+  "Punjab": ["PSPCL"],
+  "Haryana": ["UHBVNL", "DHBVNL"],
+  "Madhya Pradesh": ["MPEB", "MPPKVVCL"],
+  "Bihar": ["SBPDCL", "NBPDCL"],
+  "Odisha": ["TPCODL", "TPSODL", "TPNODL", "TPWODL"],
+  "Jharkhand": ["JBVNL"],
+  "Chhattisgarh": ["CSPDCL"],
+  "Assam": ["APDCL"],
+  "Uttarakhand": ["UPCL"],
+  "Himachal Pradesh": ["HPSEB"],
+  "Goa": ["Goa Electricity Dept"],
+  "Jammu & Kashmir": ["JKPDD"]
+};
+
+var stateSelect = document.getElementById("state");
+var providerGroup = document.getElementById("provider-group");
+var providerSelect = document.getElementById("provider");
+var monthlyUnitsInput = document.getElementById("monthly-units");
+var elecResult = document.getElementById("elec-result");
+var elecTonnes = document.getElementById("elec-tonnes");
+
+// Populate state dropdown
+Object.keys(STATE_EF).forEach(function (s) {
+  var opt = document.createElement("option");
+  opt.value = s;
+  opt.textContent = s;
+  stateSelect.appendChild(opt);
+});
+
+stateSelect.addEventListener("change", function () {
+  var state = stateSelect.value;
+  var providers = STATE_PROVIDERS[state];
+
+  providerSelect.innerHTML = '<option value="" disabled selected>Select provider</option>';
+
+  if (providers && providers.length > 0) {
+    providers.forEach(function (p) {
+      var opt = document.createElement("option");
+      opt.value = p;
+      opt.textContent = p;
+      providerSelect.appendChild(opt);
+    });
+    providerGroup.classList.remove("hidden");
+  } else {
+    providerGroup.classList.add("hidden");
+  }
+
+  updateElecResult();
+});
+
+monthlyUnitsInput.addEventListener("input", updateElecResult);
+
+function getStateEF() {
+  var state = stateSelect.value;
+  return STATE_EF[state] || 0.82;
+}
+
+function updateElecResult() {
+  var units = parseFloat(monthlyUnitsInput.value) || 0;
+  var ef = getStateEF();
+  if (units > 0 && stateSelect.value) {
+    var tonnes = (units * ef * 12) / 1000;
+    elecTonnes.textContent = tonnes.toFixed(2);
+    elecResult.classList.remove("hidden");
+  } else {
+    elecResult.classList.add("hidden");
+  }
+}
+
+// Calculate annual electricity emission in tonnes
+function calcElecEmission() {
+  var units = parseFloat(monthlyUnitsInput.value) || 0;
+  var ef = getStateEF();
+  return (units * ef * 12) / 1000;
+}
+
+// ============================================================
+// Part 3 placeholder: flights, results, donut chart
+// ============================================================
