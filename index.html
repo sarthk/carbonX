@@ -44,85 +44,187 @@
     <h2>Calculate Your Footprint</h2>
     <form id="carbon-form">
 
+      <!-- VEHICLE CASCADE -->
+      <div class="section-label">&#128663; Your Vehicle</div>
+
       <div class="form-group">
-        <label for="vehicle">Your Vehicle / Commute</label>
-        <div class="search-select" id="vehicle-search">
-          <input type="text" id="vehicle-input" placeholder="Search car, bike, or commute type..." autocomplete="off">
-          <ul class="search-dropdown hidden" id="vehicle-dropdown"></ul>
-          <input type="hidden" id="vehicle" required>
+        <label for="brand">Brand</label>
+        <select id="brand" required>
+          <option value="" disabled selected>Select brand</option>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="model-group">
+        <label for="model">Model</label>
+        <select id="model" required>
+          <option value="" disabled selected>Select model</option>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="variant-group">
+        <label for="variant">Variant</label>
+        <select id="variant" required>
+          <option value="" disabled selected>Select variant</option>
+        </select>
+      </div>
+
+      <!-- MILEAGE -->
+      <div class="form-group hidden" id="mileage-group">
+        <div class="mileage-display">
+          <span>Claimed mileage: <strong id="claimed-mileage">—</strong></span>
+        </div>
+        <div class="mileage-toggle">
+          <label class="toggle-label">
+            <input type="checkbox" id="use-actual-mileage">
+            <span>Enter my actual mileage instead</span>
+          </label>
+          <small class="mileage-note">City driving is typically 15–20% lower than claimed mileage</small>
+        </div>
+        <div class="hidden" id="actual-mileage-input">
+          <input type="number" id="actual-mileage" min="1" max="100" step="0.1" placeholder="Your actual mileage">
         </div>
       </div>
 
-      <div class="form-group" id="km-group">
-        <label for="daily-km">Daily Distance: <span id="km-value">10</span> km</label>
-        <input type="range" id="daily-km" min="1" max="50" value="10" class="slider">
+      <!-- DISTANCE SLIDER -->
+      <div class="form-group hidden" id="km-group">
+        <label>Daily Distance</label>
+        <div class="km-display"><span id="km-value">25</span> <small>km</small></div>
+        <input type="range" id="daily-km" min="0" max="500" value="25" class="slider">
         <div class="slider-labels">
-          <span>1 km</span>
-          <span>50 km</span>
+          <span>0</span><span>100</span><span>200</span><span>300</span><span>400</span><span>500</span>
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Typical Daily Meal</label>
-        <div class="meal-grid" id="meal-grid">
-          <button type="button" class="meal-card" data-meal="chicken-biryani">
-            <span class="meal-emoji">&#127835;</span>
-            <span class="meal-name">Chicken Biryani</span>
-            <span class="meal-co2">3.5 kg CO2</span>
-          </button>
-          <button type="button" class="meal-card" data-meal="mutton-curry">
-            <span class="meal-emoji">&#127830;</span>
-            <span class="meal-name">Mutton Curry</span>
-            <span class="meal-co2">5.0 kg CO2</span>
-          </button>
-          <button type="button" class="meal-card" data-meal="dal-tadka">
-            <span class="meal-emoji">&#127858;</span>
-            <span class="meal-name">Dal Tadka</span>
-            <span class="meal-co2">0.4 kg CO2</span>
-          </button>
-          <button type="button" class="meal-card" data-meal="paneer-butter-masala">
-            <span class="meal-emoji">&#129472;</span>
-            <span class="meal-name">Paneer Butter Masala</span>
-            <span class="meal-co2">1.1 kg CO2</span>
-          </button>
-          <button type="button" class="meal-card" data-meal="rajma-chawal">
-            <span class="meal-emoji">&#127834;</span>
-            <span class="meal-name">Rajma Chawal</span>
-            <span class="meal-co2">0.6 kg CO2</span>
-          </button>
-          <button type="button" class="meal-card" data-meal="egg-curry">
-            <span class="meal-emoji">&#129370;</span>
-            <span class="meal-name">Egg Curry</span>
-            <span class="meal-co2">1.2 kg CO2</span>
-          </button>
-          <button type="button" class="meal-card" data-meal="veg-thali">
-            <span class="meal-emoji">&#127869;</span>
-            <span class="meal-name">Veg Thali</span>
-            <span class="meal-co2">0.5 kg CO2</span>
-          </button>
-        </div>
-        <input type="hidden" id="meal" required>
-      </div>
+      <!-- MEALS -->
+      <div class="section-label">&#127869; Daily Meals</div>
 
       <div class="form-group">
-        <label for="energy">Home Energy Source</label>
-        <select id="energy" required>
-          <option value="" disabled selected>Select your energy source</option>
-          <option value="coal">Coal / Fossil Fuels</option>
-          <option value="mixed">Mixed</option>
-          <option value="renewable">Renewable</option>
+        <label for="meal-breakfast">Breakfast</label>
+        <select id="meal-breakfast" class="meal-select" required>
+          <option value="" disabled selected>Select breakfast</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label for="flights">Flights Per Year</label>
-        <input type="number" id="flights" min="0" max="100" placeholder="e.g. 4" required>
+        <label for="meal-lunch">Lunch</label>
+        <select id="meal-lunch" class="meal-select" required>
+          <option value="" disabled selected>Select lunch</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="meal-snack">Evening Snack</label>
+        <select id="meal-snack" class="meal-select" required>
+          <option value="" disabled selected>Select snack</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="meal-dinner">Dinner</label>
+        <select id="meal-dinner" class="meal-select" required>
+          <option value="" disabled selected>Select dinner</option>
+        </select>
+      </div>
+
+      <div class="meal-total">
+        Daily food CO2: <strong id="meal-daily-total">0</strong> kg
+        <small>Based on average serving size. CO2 includes farming, transport and cooking.</small>
+      </div>
+
+      <!-- ELECTRICITY -->
+      <div class="section-label">&#9889; Electricity</div>
+
+      <div class="form-group">
+        <label for="state">State</label>
+        <select id="state" required>
+          <option value="" disabled selected>Select your state</option>
+        </select>
+      </div>
+
+      <div class="form-group hidden" id="provider-group">
+        <label for="provider">Electricity Provider</label>
+        <select id="provider">
+          <option value="" disabled selected>Select provider</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="monthly-units">Monthly Units Consumed (kWh)</label>
+        <input type="number" id="monthly-units" min="0" max="5000" placeholder="Find this on your electricity bill as 'Units Consumed' or 'KWH'" required>
+        <small class="input-helper">A 3BHK in Delhi uses ~600–800 units/month</small>
+      </div>
+
+      <div class="elec-result hidden" id="elec-result">
+        Your electricity emits <strong id="elec-tonnes">0</strong> tonnes CO2/year
+      </div>
+
+      <!-- FLIGHTS -->
+      <div class="section-label">&#9992;&#65039; Flights</div>
+
+      <div class="trip-builder">
+        <div class="trip-row">
+          <div class="form-group trip-field">
+            <label for="flight-from">From</label>
+            <select id="flight-from">
+              <option value="" disabled selected>City</option>
+            </select>
+          </div>
+          <div class="form-group trip-field">
+            <label for="flight-to">To</label>
+            <select id="flight-to">
+              <option value="" disabled selected>City</option>
+            </select>
+          </div>
+        </div>
+        <div class="trip-row">
+          <div class="form-group trip-field">
+            <label for="flight-airline">Airline</label>
+            <select id="flight-airline">
+              <option value="" disabled selected>Airline</option>
+            </select>
+          </div>
+          <div class="form-group trip-field">
+            <label for="flight-class">Class</label>
+            <select id="flight-class">
+              <option value="economy">Economy</option>
+              <option value="business">Business</option>
+              <option value="first">First</option>
+            </select>
+          </div>
+        </div>
+        <div class="trip-row">
+          <div class="form-group trip-field">
+            <label for="flight-month">Month</label>
+            <select id="flight-month">
+              <option value="jan">Jan</option><option value="feb">Feb</option>
+              <option value="mar">Mar</option><option value="apr">Apr</option>
+              <option value="may">May</option><option value="jun">Jun</option>
+              <option value="jul">Jul</option><option value="aug">Aug</option>
+              <option value="sep">Sep</option><option value="oct">Oct</option>
+              <option value="nov">Nov</option><option value="dec">Dec</option>
+            </select>
+          </div>
+          <div class="form-group trip-field">
+            <label>Return Trip</label>
+            <div class="toggle-row">
+              <button type="button" class="toggle-btn active" id="return-yes">Yes</button>
+              <button type="button" class="toggle-btn" id="return-no">No</button>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-add-trip" id="add-trip-btn">+ Add Trip</button>
+      </div>
+
+      <div id="trip-list"></div>
+      <div class="flight-total hidden" id="flight-total">
+        Total flight CO2: <strong id="flight-total-val">0</strong> kg
       </div>
 
       <button type="submit" class="btn btn-full">Calculate My Footprint</button>
     </form>
   </section>
 
+  <!-- RESULTS -->
   <section class="results hidden" id="results">
     <div class="badge-card" id="badge-card">
       <span class="badge-emoji" id="badge-emoji"></span>
@@ -133,6 +235,17 @@
       <div class="footprint-value">
         <span id="footprint-number">0</span>
         <small>tonnes CO2 / year</small>
+      </div>
+    </div>
+
+    <!-- DONUT CHART -->
+    <div class="breakdown-card">
+      <h3>Your Breakdown</h3>
+      <div class="breakdown-layout">
+        <div class="donut-wrap">
+          <canvas id="donut-chart" width="180" height="180"></canvas>
+        </div>
+        <ul class="breakdown-legend" id="breakdown-legend"></ul>
       </div>
     </div>
 
