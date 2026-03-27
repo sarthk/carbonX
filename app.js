@@ -1379,9 +1379,12 @@ form.addEventListener("submit", function (e) {
   // Show results
   calculatorSection.style.display = "none";
   resultsSection.classList.remove("hidden");
-  if(typeof updateShareCard === 'function'){
-  updateShareCard(total, commuteEmission, mealEmission, elecEmission, flightEmission, badgeText);
-}
+  if (typeof updateShareCard === 'function') {
+    updateShareCard(total, transport, food, electricity, flights, badge.title);
+  }
+  resultsSection.scrollIntoView({ behavior: "smooth" });
+});
+
 recalculateBtn.addEventListener("click", function () {
   resultsSection.classList.add("hidden");
   cityAltSection.classList.add("hidden");
