@@ -123,6 +123,18 @@ nav {
   border-bottom: 1px solid var(--gray-100);
 }
 
+/* FULL-PAGE BACKGROUND CANVASES */
+#bg-particles,
+#fullpage-leaf-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
 /* HERO */
 .hero {
   position: relative;
