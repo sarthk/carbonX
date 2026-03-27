@@ -1,17 +1,14 @@
 // ============================================================
 // CarbonX App — Homepage: Leaf Particles & Mobile Menu
 // ============================================================
-
 // Mobile hamburger menu
 (function () {
   var hamburger = document.getElementById("nav-hamburger");
   var mobileMenu = document.getElementById("mobile-menu");
   if (!hamburger || !mobileMenu) return;
-
   hamburger.addEventListener("click", function () {
     mobileMenu.classList.toggle("hidden");
   });
-
   // Close menu on link click
   var links = mobileMenu.querySelectorAll(".mobile-link");
   links.forEach(function (link) {
@@ -20,13 +17,11 @@
     });
   });
 })();
-
 // Floating leaf particles animation
 (function () {
   var canvas = document.getElementById("leaf-canvas");
   if (!canvas) return;
   var ctx = canvas.getContext("2d");
-
   function resize() {
     var hero = canvas.parentElement;
     canvas.width = hero.offsetWidth;
@@ -34,11 +29,9 @@
   }
   resize();
   window.addEventListener("resize", resize);
-
   var leaves = [];
   var LEAF_COUNT = 18;
   var COLORS = ["#22c55e", "#4ade80", "#86efac", "#16a34a", "#bbf7d0"];
-
   function createLeaf() {
     return {
       x: Math.random() * canvas.width,
@@ -52,13 +45,11 @@
       color: COLORS[Math.floor(Math.random() * COLORS.length)]
     };
   }
-
   for (var i = 0; i < LEAF_COUNT; i++) {
     var l = createLeaf();
     l.y = Math.random() * canvas.height;
     leaves.push(l);
   }
-
   function drawLeaf(l) {
     ctx.save();
     ctx.translate(l.x, l.y);
@@ -66,14 +57,12 @@
     ctx.globalAlpha = l.opacity;
     ctx.fillStyle = l.color;
     ctx.beginPath();
-    // Simple leaf shape
     ctx.moveTo(0, -l.size);
     ctx.bezierCurveTo(l.size * 0.6, -l.size * 0.6, l.size * 0.6, l.size * 0.3, 0, l.size);
     ctx.bezierCurveTo(-l.size * 0.6, l.size * 0.3, -l.size * 0.6, -l.size * 0.6, 0, -l.size);
     ctx.fill();
     ctx.restore();
   }
-
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (var j = 0; j < leaves.length; j++) {
@@ -81,7 +70,6 @@
       l.y += l.speedY;
       l.x += l.speedX + Math.sin(l.y * 0.01) * 0.3;
       l.rotation += l.rotSpeed;
-
       if (l.y > canvas.height + 20) {
         leaves[j] = createLeaf();
       }
@@ -91,11 +79,9 @@
   }
   animate();
 })();
-
 // ============================================================
 // CarbonX App — Part 1: Vehicle Database & Cascade Dropdowns
 // ============================================================
-
 // Emission factors
 var EF = {
   petrol: 2.31,   // kg CO2 per litre
@@ -106,7 +92,6 @@ var EF = {
   auto: 0.09,     // kg CO2 per km (auto rickshaw)
   erickshaw: 0.02 // kg CO2 per km
 };
-
 // Vehicle database: brand → models → variants
 // Each variant: [name, cc/desc, fuel, claimed_mileage, mileage_unit]
 // mileage_unit: "kmpl" | "km/kg" | "km/kWh" | "km" | null
@@ -175,7 +160,6 @@ var DB = {
       ["Alpha Turbo", "998cc turbo", "petrol", 21.5, "kmpl"]
     ]
   },
-
   "Hyundai": {
     "i20": [
       ["Magna", "1197cc", "petrol", 20.35, "kmpl"],
@@ -221,7 +205,6 @@ var DB = {
       ["Sportz CNG", "1197cc", "cng", 28.3, "km/kg"]
     ]
   },
-
   "Tata Motors": {
     "Nexon": [
       ["Smart", "1199cc", "petrol", 17.4, "kmpl"],
@@ -283,7 +266,6 @@ var DB = {
       ["XZ+ LR", "electric", "electric", 4.5, "km/kWh"]
     ]
   },
-
   "Mahindra": {
     "Scorpio-N": [
       ["Z4", "1997cc", "diesel", 15.0, "kmpl"],
@@ -321,7 +303,6 @@ var DB = {
       ["EL Pro", "electric", "electric", 4.0, "km/kWh"]
     ]
   },
-
   "Kia": {
     "Seltos": [
       ["HTE", "1497cc", "petrol", 16.8, "kmpl"],
@@ -348,7 +329,6 @@ var DB = {
       ["GT AWD", "electric", "electric", 3.9, "km/kWh"]
     ]
   },
-
   "Toyota": {
     "Innova Crysta": [
       ["GX", "2393cc", "diesel", 15.1, "kmpl"],
@@ -386,7 +366,6 @@ var DB = {
       ["Hybrid", "2487cc hybrid", "petrol", 19.1, "kmpl"]
     ]
   },
-
   "Honda": {
     "City": [
       ["V", "1498cc", "petrol", 17.8, "kmpl"],
@@ -413,7 +392,6 @@ var DB = {
       ["VX Diesel", "1498cc", "diesel", 23.7, "kmpl"]
     ]
   },
-
   "MG Motor": {
     "Hector": [
       ["Style", "1451cc turbo", "petrol", 14.5, "kmpl"],
@@ -436,7 +414,6 @@ var DB = {
       ["Play", "electric", "electric", 6.5, "km/kWh"]
     ]
   },
-
   "Renault": {
     "Kiger": [
       ["RXE", "999cc", "petrol", 20.5, "kmpl"],
@@ -454,7 +431,6 @@ var DB = {
       ["Climber", "999cc", "petrol", 21.7, "kmpl"]
     ]
   },
-
   "Volkswagen": {
     "Taigun": [
       ["Comfortline", "999cc turbo", "petrol", 19.0, "kmpl"],
@@ -469,7 +445,6 @@ var DB = {
       ["GT+", "1498cc turbo", "petrol", 18.0, "kmpl"]
     ]
   },
-
   "Skoda": {
     "Kushaq": [
       ["Active", "999cc turbo", "petrol", 19.0, "kmpl"],
@@ -484,7 +459,6 @@ var DB = {
       ["Laurin & Klement", "1498cc turbo", "petrol", 18.0, "kmpl"]
     ]
   },
-
   "Hero MotoCorp (2W)": {
     "Splendor+": [
       ["Kick", "97.2cc", "petrol", 70.0, "kmpl"],
@@ -501,7 +475,6 @@ var DB = {
       ["Disc", "113.2cc", "petrol", 60.0, "kmpl"]
     ]
   },
-
   "Bajaj (2W)": {
     "Pulsar NS200": [
       ["Standard", "199.5cc", "petrol", 40.0, "kmpl"],
@@ -516,7 +489,6 @@ var DB = {
       ["ES Alloy", "102cc", "petrol", 75.0, "kmpl"]
     ]
   },
-
   "TVS (2W)": {
     "Apache RTR 160": [
       ["Drum", "159.7cc", "petrol", 48.0, "kmpl"],
@@ -533,7 +505,6 @@ var DB = {
       ["Super Squad", "124.8cc", "petrol", 45.0, "kmpl"]
     ]
   },
-
   "Ola Electric": {
     "S1 Pro": [
       ["S1 Pro", "electric", "electric", 9.0, "km/kWh"],
@@ -547,7 +518,6 @@ var DB = {
       ["3 kWh", "electric", "electric", 10.5, "km/kWh"]
     ]
   },
-
   "Ather Energy": {
     "450X": [
       ["450X", "electric", "electric", 9.5, "km/kWh"],
@@ -557,7 +527,6 @@ var DB = {
       ["450S", "electric", "electric", 10.0, "km/kWh"]
     ]
   },
-
   "Public Transport": {
     "Delhi Metro": [
       ["Delhi Metro", "metro", "public", null, "km"]
@@ -572,7 +541,6 @@ var DB = {
       ["E-Rickshaw", "erickshaw", "erickshaw", null, "km"]
     ]
   },
-
   "Walk/Cycle": {
     "Walk": [
       ["Walking", "zero emission", "walk", null, null]
@@ -582,14 +550,12 @@ var DB = {
     ]
   }
 };
-
 // ============================================================
 // State for selected vehicle
 // ============================================================
 var selectedBrand = null;
 var selectedModel = null;
 var selectedVariant = null; // [name, desc, fuel, mileage, unit]
-
 // ============================================================
 // Cascade dropdown logic
 // ============================================================
@@ -606,7 +572,6 @@ var actualMileageField = document.getElementById("actual-mileage");
 var kmGroup = document.getElementById("km-group");
 var kmSlider = document.getElementById("daily-km");
 var kmValue = document.getElementById("km-value");
-
 // Populate brands
 Object.keys(DB).forEach(function (brand) {
   var opt = document.createElement("option");
@@ -614,13 +579,10 @@ Object.keys(DB).forEach(function (brand) {
   opt.textContent = brand;
   brandSelect.appendChild(opt);
 });
-
 brandSelect.addEventListener("change", function () {
   selectedBrand = brandSelect.value;
   selectedModel = null;
   selectedVariant = null;
-
-  // Reset downstream
   modelSelect.innerHTML = '<option value="" disabled selected>Select model</option>';
   variantSelect.innerHTML = '<option value="" disabled selected>Select variant</option>';
   variantGroup.classList.add("hidden");
@@ -628,33 +590,26 @@ brandSelect.addEventListener("change", function () {
   kmGroup.classList.add("hidden");
   useActualCheckbox.checked = false;
   actualMileageInput.classList.add("hidden");
-
   var models = DB[selectedBrand];
   if (!models) return;
-
   Object.keys(models).forEach(function (model) {
     var opt = document.createElement("option");
     opt.value = model;
     opt.textContent = model;
     modelSelect.appendChild(opt);
   });
-
   modelGroup.classList.remove("hidden");
 });
-
 modelSelect.addEventListener("change", function () {
   selectedModel = modelSelect.value;
   selectedVariant = null;
-
   variantSelect.innerHTML = '<option value="" disabled selected>Select variant</option>';
   mileageGroup.classList.add("hidden");
   kmGroup.classList.add("hidden");
   useActualCheckbox.checked = false;
   actualMileageInput.classList.add("hidden");
-
   var variants = DB[selectedBrand][selectedModel];
   if (!variants) return;
-
   variants.forEach(function (v, i) {
     var opt = document.createElement("option");
     opt.value = i;
@@ -666,18 +621,13 @@ modelSelect.addEventListener("change", function () {
     opt.textContent = label;
     variantSelect.appendChild(opt);
   });
-
   variantGroup.classList.remove("hidden");
 });
-
 variantSelect.addEventListener("change", function () {
   var idx = parseInt(variantSelect.value, 10);
   selectedVariant = DB[selectedBrand][selectedModel][idx];
-
-  // Show mileage section for petrol/diesel/cng (not public/walk/electric)
   var fuel = selectedVariant[2];
   var showMileage = (fuel === "petrol" || fuel === "diesel" || fuel === "cng");
-
   if (showMileage) {
     var unit = selectedVariant[4] || "kmpl";
     claimedMileageEl.textContent = selectedVariant[3] + " " + unit;
@@ -685,18 +635,14 @@ variantSelect.addEventListener("change", function () {
   } else {
     mileageGroup.classList.add("hidden");
   }
-
-  // Show distance slider for everything except walk
   if (fuel === "walk") {
     kmGroup.classList.add("hidden");
   } else {
     kmGroup.classList.remove("hidden");
   }
-
   useActualCheckbox.checked = false;
   actualMileageInput.classList.add("hidden");
 });
-
 // Mileage toggle
 useActualCheckbox.addEventListener("change", function () {
   if (useActualCheckbox.checked) {
@@ -706,12 +652,10 @@ useActualCheckbox.addEventListener("change", function () {
     actualMileageInput.classList.add("hidden");
   }
 });
-
 // KM slider
 kmSlider.addEventListener("input", function () {
   kmValue.textContent = kmSlider.value;
 });
-
 // ============================================================
 // Helper: get effective mileage for selected variant
 // ============================================================
@@ -720,9 +664,8 @@ function getEffectiveMileage() {
   if (useActualCheckbox.checked && actualMileageField.value) {
     return parseFloat(actualMileageField.value);
   }
-  return selectedVariant[3]; // claimed
+  return selectedVariant[3];
 }
-
 // ============================================================
 // Helper: calculate commute CO2 in tonnes/year
 // ============================================================
@@ -730,48 +673,23 @@ function calcCommuteEmission() {
   if (!selectedVariant) return 0;
   var fuel = selectedVariant[2];
   var dailyKm = parseInt(kmSlider.value, 10) || 0;
-
   if (fuel === "walk") return 0;
-
-  if (fuel === "public") {
-    return (dailyKm * EF.public * 365) / 1000;
-  }
-  if (fuel === "auto") {
-    return (dailyKm * EF.auto * 365) / 1000;
-  }
-  if (fuel === "erickshaw") {
-    return (dailyKm * EF.erickshaw * 365) / 1000;
-  }
-
-  // Electric vehicles — emission goes into electricity section conceptually,
-  // but we calculate it here for transport category
+  if (fuel === "public") return (dailyKm * EF.public * 365) / 1000;
+  if (fuel === "auto") return (dailyKm * EF.auto * 365) / 1000;
+  if (fuel === "erickshaw") return (dailyKm * EF.erickshaw * 365) / 1000;
   if (fuel === "electric") {
     var kmPerKwh = getEffectiveMileage();
     if (!kmPerKwh || kmPerKwh === 0) return 0;
     return (dailyKm / kmPerKwh) * EF.electric * 365 / 1000;
   }
-
-  // Petrol / Diesel / CNG
   var mileage = getEffectiveMileage();
   if (!mileage || mileage === 0) return 0;
-
-  var factor;
-  if (fuel === "cng") {
-    factor = EF.cng;
-  } else if (fuel === "diesel") {
-    factor = EF.diesel;
-  } else {
-    factor = EF.petrol;
-  }
-
+  var factor = fuel === "cng" ? EF.cng : fuel === "diesel" ? EF.diesel : EF.petrol;
   return ((dailyKm / mileage) * factor * 365) / 1000;
 }
-
 // ============================================================
 // Part 2: Meals & Electricity
 // ============================================================
-
-// ---------- MEAL DATA ----------
 var MEAL_OPTIONS = [
   ["", "Select meal", 0],
   ["skip", "Skip this meal \u2014 0 kg CO2", 0],
@@ -791,12 +709,8 @@ var MEAL_OPTIONS = [
   ["nonveg-thali", "Non-veg thali (full) \u2014 2.5 kg CO2", 2.5],
   ["fastfood", "Fast food (burger/pizza) \u2014 2.0 kg CO2", 2.0]
 ];
-
-// Build a lookup: id → co2
 var MEAL_CO2 = {};
 MEAL_OPTIONS.forEach(function (m) { MEAL_CO2[m[0]] = m[2]; });
-
-// Populate 4 meal dropdowns
 var mealSelects = document.querySelectorAll(".meal-select");
 mealSelects.forEach(function (sel) {
   MEAL_OPTIONS.forEach(function (m) {
@@ -807,9 +721,7 @@ mealSelects.forEach(function (sel) {
     sel.appendChild(opt);
   });
 });
-
 var mealDailyTotal = document.getElementById("meal-daily-total");
-
 function updateMealTotal() {
   var total = 0;
   mealSelects.forEach(function (sel) {
@@ -818,48 +730,24 @@ function updateMealTotal() {
   mealDailyTotal.textContent = total.toFixed(1);
   return total;
 }
-
 mealSelects.forEach(function (sel) {
   sel.addEventListener("change", updateMealTotal);
 });
-
-// Calculate annual meal emission in tonnes
 function calcMealEmission() {
   var dailyKg = updateMealTotal();
   return (dailyKg * 365) / 1000;
 }
-
 // ---------- ELECTRICITY DATA ----------
-
-// State → emission factor (kg CO2 per kWh)
 var STATE_EF = {
-  "Delhi": 0.82,
-  "Maharashtra": 0.72,
-  "Karnataka": 0.61,
-  "Tamil Nadu": 0.78,
-  "Uttar Pradesh": 0.88,
-  "Gujarat": 0.76,
-  "Rajasthan": 0.84,
-  "West Bengal": 0.90,
-  "Telangana": 0.74,
-  "Andhra Pradesh": 0.72,
-  "Kerala": 0.40,
-  "Punjab": 0.80,
-  "Haryana": 0.83,
-  "Madhya Pradesh": 0.86,
-  "Bihar": 0.89,
-  "Odisha": 0.88,
-  "Jharkhand": 0.91,
-  "Chhattisgarh": 0.92,
-  "Assam": 0.78,
-  "Uttarakhand": 0.50,
-  "Himachal Pradesh": 0.30,
-  "Goa": 0.75,
-  "Jammu & Kashmir": 0.55,
-  "Other": 0.82
+  "Delhi": 0.82, "Maharashtra": 0.72, "Karnataka": 0.61,
+  "Tamil Nadu": 0.78, "Uttar Pradesh": 0.88, "Gujarat": 0.76,
+  "Rajasthan": 0.84, "West Bengal": 0.90, "Telangana": 0.74,
+  "Andhra Pradesh": 0.72, "Kerala": 0.40, "Punjab": 0.80,
+  "Haryana": 0.83, "Madhya Pradesh": 0.86, "Bihar": 0.89,
+  "Odisha": 0.88, "Jharkhand": 0.91, "Chhattisgarh": 0.92,
+  "Assam": 0.78, "Uttarakhand": 0.50, "Himachal Pradesh": 0.30,
+  "Goa": 0.75, "Jammu & Kashmir": 0.55, "Other": 0.82
 };
-
-// State → providers list
 var STATE_PROVIDERS = {
   "Delhi": ["Tata Power DDL", "BSES Rajdhani", "BSES Yamuna", "NDPL"],
   "Maharashtra": ["Tata Power Mumbai", "MSEDCL", "Adani Electricity"],
@@ -871,42 +759,32 @@ var STATE_PROVIDERS = {
   "West Bengal": ["WBSEDCL", "CESC Kolkata"],
   "Telangana": ["TSSPDCL", "TSNPDCL"],
   "Andhra Pradesh": ["APSPDCL", "APEPDCL"],
-  "Kerala": ["KSEB"],
-  "Punjab": ["PSPCL"],
+  "Kerala": ["KSEB"], "Punjab": ["PSPCL"],
   "Haryana": ["UHBVNL", "DHBVNL"],
   "Madhya Pradesh": ["MPEB", "MPPKVVCL"],
   "Bihar": ["SBPDCL", "NBPDCL"],
   "Odisha": ["TPCODL", "TPSODL", "TPNODL", "TPWODL"],
-  "Jharkhand": ["JBVNL"],
-  "Chhattisgarh": ["CSPDCL"],
-  "Assam": ["APDCL"],
-  "Uttarakhand": ["UPCL"],
-  "Himachal Pradesh": ["HPSEB"],
-  "Goa": ["Goa Electricity Dept"],
+  "Jharkhand": ["JBVNL"], "Chhattisgarh": ["CSPDCL"],
+  "Assam": ["APDCL"], "Uttarakhand": ["UPCL"],
+  "Himachal Pradesh": ["HPSEB"], "Goa": ["Goa Electricity Dept"],
   "Jammu & Kashmir": ["JKPDD"]
 };
-
 var stateSelect = document.getElementById("state");
 var providerGroup = document.getElementById("provider-group");
 var providerSelect = document.getElementById("provider");
 var monthlyUnitsInput = document.getElementById("monthly-units");
 var elecResult = document.getElementById("elec-result");
 var elecTonnes = document.getElementById("elec-tonnes");
-
-// Populate state dropdown
 Object.keys(STATE_EF).forEach(function (s) {
   var opt = document.createElement("option");
   opt.value = s;
   opt.textContent = s;
   stateSelect.appendChild(opt);
 });
-
 stateSelect.addEventListener("change", function () {
   var state = stateSelect.value;
   var providers = STATE_PROVIDERS[state];
-
   providerSelect.innerHTML = '<option value="" disabled selected>Select provider</option>';
-
   if (providers && providers.length > 0) {
     providers.forEach(function (p) {
       var opt = document.createElement("option");
@@ -918,65 +796,38 @@ stateSelect.addEventListener("change", function () {
   } else {
     providerGroup.classList.add("hidden");
   }
-
   updateElecResult();
 });
-
 monthlyUnitsInput.addEventListener("input", updateElecResult);
-
 function getStateEF() {
-  var state = stateSelect.value;
-  return STATE_EF[state] || 0.82;
+  return STATE_EF[stateSelect.value] || 0.82;
 }
-
 function updateElecResult() {
   var units = parseFloat(monthlyUnitsInput.value) || 0;
   var ef = getStateEF();
   if (units > 0 && stateSelect.value) {
-    var tonnes = (units * ef * 12) / 1000;
-    elecTonnes.textContent = tonnes.toFixed(2);
+    elecTonnes.textContent = ((units * ef * 12) / 1000).toFixed(2);
     elecResult.classList.remove("hidden");
   } else {
     elecResult.classList.add("hidden");
   }
 }
-
-// Calculate annual electricity emission in tonnes
 function calcElecEmission() {
   var units = parseFloat(monthlyUnitsInput.value) || 0;
-  var ef = getStateEF();
-  return (units * ef * 12) / 1000;
+  return (units * getStateEF() * 12) / 1000;
 }
-
 // ============================================================
 // Part 3: Flights, Results, Donut Chart, Badges, WhatsApp
 // ============================================================
-
-// ---------- AIRPORT / ROUTE DATA ----------
 var AIRPORTS = [
-  ["DEL", "Delhi (DEL)"],
-  ["BOM", "Mumbai (BOM)"],
-  ["BLR", "Bengaluru (BLR)"],
-  ["MAA", "Chennai (MAA)"],
-  ["CCU", "Kolkata (CCU)"],
-  ["HYD", "Hyderabad (HYD)"],
-  ["COK", "Kochi (COK)"],
-  ["AMD", "Ahmedabad (AMD)"],
-  ["GOI", "Goa (GOI)"],
-  ["JAI", "Jaipur (JAI)"],
-  ["LKO", "Lucknow (LKO)"],
-  ["PNQ", "Pune (PNQ)"],
-  ["DXB", "Dubai (DXB)"],
-  ["LHR", "London (LHR)"],
-  ["SIN", "Singapore (SIN)"],
-  ["BKK", "Bangkok (BKK)"],
-  ["JFK", "New York (JFK)"],
-  ["CDG", "Paris (CDG)"],
-  ["SYD", "Sydney (SYD)"],
-  ["NRT", "Tokyo (NRT)"]
+  ["DEL", "Delhi (DEL)"], ["BOM", "Mumbai (BOM)"], ["BLR", "Bengaluru (BLR)"],
+  ["MAA", "Chennai (MAA)"], ["CCU", "Kolkata (CCU)"], ["HYD", "Hyderabad (HYD)"],
+  ["COK", "Kochi (COK)"], ["AMD", "Ahmedabad (AMD)"], ["GOI", "Goa (GOI)"],
+  ["JAI", "Jaipur (JAI)"], ["LKO", "Lucknow (LKO)"], ["PNQ", "Pune (PNQ)"],
+  ["DXB", "Dubai (DXB)"], ["LHR", "London (LHR)"], ["SIN", "Singapore (SIN)"],
+  ["BKK", "Bangkok (BKK)"], ["JFK", "New York (JFK)"], ["CDG", "Paris (CDG)"],
+  ["SYD", "Sydney (SYD)"], ["NRT", "Tokyo (NRT)"]
 ];
-
-// Hardcoded distances in km for key pairs (alphabetical key)
 var ROUTE_KM = {
   "AMD-BOM": 524, "AMD-DEL": 776,
   "BLR-BOM": 984, "BLR-CCU": 1871, "BLR-DEL": 1740, "BLR-HYD": 570,
@@ -991,52 +842,33 @@ var ROUTE_KM = {
   "DEL-NRT": 5839, "DEL-PNQ": 1177, "DEL-SIN": 5985, "DEL-SYD": 10147,
   "HYD-MAA": 625
 };
-
-function getRouteKey(a, b) {
-  return a < b ? a + "-" + b : b + "-" + a;
-}
-
-function getRouteDistance(from, to) {
-  if (from === to) return 0;
-  var key = getRouteKey(from, to);
-  return ROUTE_KM[key] || null;
-}
-
-// ICAO standard: 0.255 kg CO2 per km economy
-var KG_CO2_PER_KM = 0.255;
-
-// Hardcoded economy CO2 for key routes (kg)
 var ROUTE_CO2 = {
   "BOM-DEL": 293, "BLR-DEL": 443, "DEL-MAA": 448, "CCU-DEL": 333,
   "DEL-HYD": 319, "DEL-GOI": 484, "DEL-DXB": 557, "DEL-LHR": 1712,
   "DEL-SIN": 1526, "DEL-JFK": 2998, "BOM-LHR": 1835
 };
-
+var KG_CO2_PER_KM = 0.255;
+function getRouteKey(a, b) { return a < b ? a + "-" + b : b + "-" + a; }
+function getRouteDistance(from, to) {
+  if (from === to) return 0;
+  return ROUTE_KM[getRouteKey(from, to)] || null;
+}
 function calcFlightCO2(from, to, cls, isReturn) {
   var key = getRouteKey(from, to);
   var baseCO2 = ROUTE_CO2[key];
   if (!baseCO2) {
-    var dist = getRouteDistance(from, to);
-    if (!dist) {
-      // Estimate: ~2500 km average unknown route
-      dist = 2500;
-    }
+    var dist = getRouteDistance(from, to) || 2500;
     baseCO2 = Math.round(dist * KG_CO2_PER_KM);
   }
-  var multiplier = 1;
-  if (cls === "business") multiplier = 2.5;
-  if (cls === "first") multiplier = 4;
+  var multiplier = cls === "business" ? 2.5 : cls === "first" ? 4 : 1;
   var oneWay = Math.round(baseCO2 * multiplier);
   return isReturn ? oneWay * 2 : oneWay;
 }
-
 var AIRLINES = [
   "IndiGo", "Air India", "SpiceJet", "Vistara", "GoFirst",
   "AirAsia India", "Emirates", "Qatar Airways", "Singapore Airlines",
   "British Airways", "Lufthansa", "Other"
 ];
-
-// ---------- POPULATE FLIGHT FORM ----------
 var flightFrom = document.getElementById("flight-from");
 var flightTo = document.getElementById("flight-to");
 var flightAirline = document.getElementById("flight-airline");
@@ -1047,7 +879,6 @@ var addTripBtn = document.getElementById("add-trip-btn");
 var tripListEl = document.getElementById("trip-list");
 var flightTotalEl = document.getElementById("flight-total");
 var flightTotalVal = document.getElementById("flight-total-val");
-
 AIRPORTS.forEach(function (a) {
   var o1 = document.createElement("option");
   o1.value = a[0]; o1.textContent = a[1];
@@ -1056,14 +887,11 @@ AIRPORTS.forEach(function (a) {
   o2.value = a[0]; o2.textContent = a[1];
   flightTo.appendChild(o2);
 });
-
 AIRLINES.forEach(function (a) {
   var opt = document.createElement("option");
   opt.value = a; opt.textContent = a;
   flightAirline.appendChild(opt);
 });
-
-// Return toggle
 var isReturnTrip = true;
 returnYes.addEventListener("click", function () {
   isReturnTrip = true;
@@ -1075,10 +903,7 @@ returnNo.addEventListener("click", function () {
   returnNo.classList.add("active");
   returnYes.classList.remove("active");
 });
-
-// Trip list
 var trips = [];
-
 function renderTrips() {
   tripListEl.innerHTML = "";
   var totalKg = 0;
@@ -1107,23 +932,18 @@ function renderTrips() {
     flightTotalEl.classList.add("hidden");
   }
 }
-
 tripListEl.addEventListener("click", function (e) {
   var btn = e.target.closest(".trip-remove");
   if (!btn) return;
-  var idx = parseInt(btn.getAttribute("data-idx"), 10);
-  trips.splice(idx, 1);
+  trips.splice(parseInt(btn.getAttribute("data-idx"), 10), 1);
   renderTrips();
 });
-
 addTripBtn.addEventListener("click", function () {
   var from = flightFrom.value;
   var to = flightTo.value;
-  var airline = flightAirline.value;
+  var airline = flightAirline.value || "Other";
   var cls = flightClass.value;
   if (!from || !to || from === to) return;
-  if (!airline) airline = "Other";
-
   var co2 = calcFlightCO2(from, to, cls, isReturnTrip);
   trips.push({
     from: from, to: to, airline: airline,
@@ -1132,13 +952,11 @@ addTripBtn.addEventListener("click", function () {
   });
   renderTrips();
 });
-
 function calcFlightEmission() {
   var totalKg = 0;
   trips.forEach(function (t) { totalKg += t.co2; });
-  return totalKg / 1000; // tonnes
+  return totalKg / 1000;
 }
-
 // ---------- BADGES ----------
 var BADGES = [
   { max: 0.5, emoji: "\uD83C\uDF0D", title: "Earth Guardian" },
@@ -1147,34 +965,29 @@ var BADGES = [
   { max: 8.0, emoji: "\u26A1", title: "Needs Action" },
   { max: Infinity, emoji: "\uD83D\uDD25", title: "High Emitter" }
 ];
-
 function getBadge(total) {
   for (var i = 0; i < BADGES.length; i++) {
     if (total <= BADGES[i].max) return BADGES[i];
   }
   return BADGES[BADGES.length - 1];
 }
-
 // ---------- CITY TRANSPORT ALTERNATIVES ----------
 var CITY_ALTS = [
   { name: "Delhi Metro", co2PerKm: 0.03, costLabel: "\u20B940/day" },
   { name: "DTC Electric Bus", co2PerKm: 0.02, costLabel: "\u20B925/day" },
   { name: "Ola Electric Scooter", co2PerKm: 0.005, costLabel: null }
 ];
-
 function getCityAlternatives() {
   if (!selectedVariant) return [];
   var fuel = selectedVariant[2];
   if (fuel === "walk" || fuel === "public" || fuel === "auto" || fuel === "erickshaw") return [];
   var dailyKm = parseInt(kmSlider.value, 10) || 0;
   var userTonnes = calcCommuteEmission();
-
   return CITY_ALTS.map(function (alt) {
     var altTonnes = (dailyKm * alt.co2PerKm * 365) / 1000;
     return { name: alt.name, saving: userTonnes - altTonnes, costLabel: alt.costLabel };
   }).filter(function (a) { return a.saving > 0.01; });
 }
-
 // ---------- SUGGESTIONS ----------
 var SUGGESTIONS = {
   transport: [
@@ -1198,46 +1011,29 @@ var SUGGESTIONS = {
     "Offset your flights through verified carbon offset programmes like Gold Standard."
   ]
 };
-
 function getTopSuggestions(categories) {
-  // categories sorted biggest first: [{name, val}]
   var tips = [];
   for (var i = 0; i < categories.length && tips.length < 3; i++) {
-    var cat = categories[i].name;
-    var pool = SUGGESTIONS[cat];
-    if (pool && categories[i].val > 0) {
-      tips.push(pool[0]);
-    }
+    var pool = SUGGESTIONS[categories[i].name];
+    if (pool && categories[i].val > 0) tips.push(pool[0]);
   }
-  // Fill with secondary tips
   for (var j = 0; j < categories.length && tips.length < 3; j++) {
-    var cat2 = categories[j].name;
-    var pool2 = SUGGESTIONS[cat2];
-    if (pool2 && pool2[1] && tips.indexOf(pool2[1]) === -1) {
-      tips.push(pool2[1]);
-    }
+    var pool2 = SUGGESTIONS[categories[j].name];
+    if (pool2 && pool2[1] && tips.indexOf(pool2[1]) === -1) tips.push(pool2[1]);
   }
   return tips.slice(0, 3);
 }
-
 // ---------- DONUT CHART ----------
 var DONUT_COLORS = ["#16a34a", "#f59e0b", "#3b82f6", "#8b5cf6"];
-
 function drawDonut(canvas, segments) {
   var ctx = canvas.getContext("2d");
-  var W = canvas.width;
-  var H = canvas.height;
-  var cx = W / 2;
-  var cy = H / 2;
+  var cx = canvas.width / 2, cy = canvas.height / 2;
   var outerR = Math.min(cx, cy) - 4;
   var innerR = outerR * 0.55;
-
-  ctx.clearRect(0, 0, W, H);
-
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   var total = 0;
   segments.forEach(function (s) { total += s.val; });
   if (total === 0) return;
-
   var startAngle = -Math.PI / 2;
   segments.forEach(function (s, i) {
     var sliceAngle = (s.val / total) * Math.PI * 2;
@@ -1249,15 +1045,12 @@ function drawDonut(canvas, segments) {
     ctx.fill();
     startAngle += sliceAngle;
   });
-
-  // Center text
   ctx.fillStyle = "#1f2937";
   ctx.font = "bold 1.1rem -apple-system, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText(total.toFixed(1) + "t", cx, cy);
 }
-
 // ---------- RESULTS DOM ----------
 var form = document.getElementById("carbon-form");
 var calculatorSection = document.querySelector(".calculator");
@@ -1274,15 +1067,16 @@ var altList = document.getElementById("alternatives-list");
 var whatsappBtn = document.getElementById("whatsapp-btn");
 var donutCanvas = document.getElementById("donut-chart");
 var breakdownLegend = document.getElementById("breakdown-legend");
-
 var GLOBAL_AVG = 4.0;
 var INDIA_AVG = 1.9;
 var MAX_BAR = 10;
 
+// ============================================================
+// FORM SUBMIT — calculate and show results
+// ============================================================
 form.addEventListener("submit", function (e) {
   e.preventDefault();
 
-  // Calculate all four categories
   var transport = calcCommuteEmission();
   var food = calcMealEmission();
   var electricity = calcElecEmission();
@@ -1301,21 +1095,15 @@ form.addEventListener("submit", function (e) {
   var youPercent = Math.min((total / MAX_BAR) * 100, 100);
   barYou.style.width = youPercent + "%";
   barYouVal.textContent = total.toFixed(1) + "t";
-
-  if (total <= INDIA_AVG) {
-    barYou.style.background = "var(--green-400)";
-  } else if (total <= GLOBAL_AVG) {
-    barYou.style.background = "var(--green-500)";
-  } else {
-    barYou.style.background = "#f59e0b";
-  }
+  barYou.style.background = total <= INDIA_AVG ? "var(--green-400)"
+    : total <= GLOBAL_AVG ? "var(--green-500)" : "#f59e0b";
 
   // Donut chart
   var segments = [
-    { label: "\uD83D\uDE97 Transport", val: transport, color: DONUT_COLORS[0] },
-    { label: "\uD83C\uDF7D\uFE0F Food", val: food, color: DONUT_COLORS[1] },
-    { label: "\u26A1 Electricity", val: electricity, color: DONUT_COLORS[2] },
-    { label: "\u2708\uFE0F Flights", val: flights, color: DONUT_COLORS[3] }
+    { label: "\uD83D\uDE97 Transport", val: transport },
+    { label: "\uD83C\uDF7D\uFE0F Food", val: food },
+    { label: "\u26A1 Electricity", val: electricity },
+    { label: "\u2708\uFE0F Flights", val: flights }
   ];
   drawDonut(donutCanvas, segments);
 
@@ -1338,13 +1126,10 @@ form.addEventListener("submit", function (e) {
     altList.innerHTML = "";
     alternatives.forEach(function (alt) {
       var li = document.createElement("li");
-      var costStr = alt.costLabel
-        ? ' <span class="alt-cost">(' + alt.costLabel + ")</span>"
-        : "";
+      var costStr = alt.costLabel ? ' <span class="alt-cost">(' + alt.costLabel + ")</span>" : "";
       li.innerHTML =
         '<span class="alt-name">' + alt.name + "</span>: saves " +
-        '<span class="alt-saving">' + alt.saving.toFixed(2) + " tonnes/year</span>" +
-        costStr;
+        '<span class="alt-saving">' + alt.saving.toFixed(2) + " tonnes/year</span>" + costStr;
       altList.appendChild(li);
     });
     cityAltSection.classList.remove("hidden");
@@ -1352,20 +1137,18 @@ form.addEventListener("submit", function (e) {
     cityAltSection.classList.add("hidden");
   }
 
-  // Suggestions — target biggest category first
+  // Suggestions
   var sorted = [
     { name: "transport", val: transport },
     { name: "food", val: food },
     { name: "electricity", val: electricity },
     { name: "flights", val: flights }
   ].sort(function (a, b) { return b.val - a.val; });
-
   var tips = getTopSuggestions(sorted);
   suggestionsList.innerHTML = "";
   tips.forEach(function (tip, i) {
     var li = document.createElement("li");
-    li.innerHTML =
-      '<span class="suggestion-icon">' + (i + 1) + "</span><span>" + tip + "</span>";
+    li.innerHTML = '<span class="suggestion-icon">' + (i + 1) + "</span><span>" + tip + "</span>";
     suggestionsList.appendChild(li);
   });
 
@@ -1376,15 +1159,20 @@ form.addEventListener("submit", function (e) {
     " Calculate yours: sarthk.github.io/carbonX";
   whatsappBtn.href = "https://wa.me/?text=" + encodeURIComponent(shareText);
 
-  // Show results
-  calculatorSection.style.display = "none";
-  resultsSection.classList.remove("hidden");
+  // Update share card
   if (typeof updateShareCard === 'function') {
     updateShareCard(total, transport, food, electricity, flights, badge.title);
   }
+
+  // Show results
+  calculatorSection.style.display = "none";
+  resultsSection.classList.remove("hidden");
   resultsSection.scrollIntoView({ behavior: "smooth" });
 });
 
+// ============================================================
+// RECALCULATE — outside submit handler
+// ============================================================
 recalculateBtn.addEventListener("click", function () {
   resultsSection.classList.add("hidden");
   cityAltSection.classList.add("hidden");
