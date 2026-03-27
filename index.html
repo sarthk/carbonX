@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ND94BBXL3Z"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ND94BBXL3Z');
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CarbonX - Track Your Carbon Footprint</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Full-page background canvases -->
-  <canvas id="bg-particles"></canvas>
-  <canvas id="fullpage-leaf-canvas"></canvas>
-
+  <canvas id="particle-canvas"></canvas>
   <header>
     <nav>
       <div class="logo">Carbon<span>X</span></div>
@@ -363,39 +368,40 @@
       <svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       Share on WhatsApp
     </a>
+
     <div id="share-section" style="margin-top:1.5rem">
-  <div id="score-card-share" style="background:#0f4f25;border-radius:16px;padding:1.5rem;color:#fff;margin-bottom:1rem">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-      <span style="font-size:20px;font-weight:700">Carbon<span style="color:#5DCAA5">X</span></span>
-      <span id="share-badge" style="font-size:11px;padding:4px 10px;border-radius:20px;background:#1D9E75;color:#E1F5EE"></span>
+      <div id="score-card-share" style="background:#0f4f25;border-radius:16px;padding:1.5rem;color:#fff;margin-bottom:1rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <span style="font-size:20px;font-weight:700">Carbon<span style="color:#5DCAA5">X</span></span>
+          <span id="share-badge" style="font-size:11px;padding:4px 10px;border-radius:20px;background:#1D9E75;color:#E1F5EE"></span>
+        </div>
+        <div style="text-align:center;margin-bottom:1rem">
+          <div id="share-total" style="font-size:52px;font-weight:700;line-height:1"></div>
+          <div style="font-size:13px;opacity:0.7;margin-top:4px">tonnes CO2 per year</div>
+        </div>
+        <div id="share-bars" style="margin-bottom:1rem"></div>
+        <div style="border-top:1px solid rgba(255,255,255,0.15);padding-top:1rem;display:flex;justify-content:space-around;margin-bottom:1rem">
+          <div style="text-align:center"><div id="share-you" style="font-size:18px;font-weight:700"></div><div style="font-size:10px;opacity:0.5">You</div></div>
+          <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#5DCAA5">1.9t</div><div style="font-size:10px;opacity:0.5">India avg</div></div>
+          <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#9FE1CB">4.0t</div><div style="font-size:10px;opacity:0.5">World avg</div></div>
+        </div>
+        <div style="text-align:center;font-size:11px;opacity:0.5">Calculate yours at sarthk.github.io/carbonX</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:1rem">
+        <button onclick="shareWA()" style="flex:1;padding:10px;background:#25D366;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer">WhatsApp</button>
+        <button id="copy-btn" onclick="copyLink()" style="flex:1;padding:10px;background:#f0f0f0;border:none;border-radius:10px;font-size:13px;cursor:pointer">Copy Link</button>
+        <button onclick="downloadCard()" style="flex:1;padding:10px;background:#0f4f25;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer">Download</button>
+      </div>
+      <div style="background:#f9fff9;border-radius:12px;padding:1rem;border:1px solid #c0dd97">
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px">Get your monthly carbon report</div>
+        <div style="font-size:12px;color:#555;margin-bottom:10px">Personalised tips to reduce your footprint.</div>
+        <div style="display:flex;gap:8px">
+          <input id="email-input" type="text" placeholder="Email or WhatsApp number" style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid #ccc;font-size:13px">
+          <button onclick="subscribe()" style="padding:8px 16px;background:#0f4f25;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">Subscribe</button>
+        </div>
+        <div id="thankyou" style="display:none;color:#3B6D11;font-size:13px;font-weight:500;margin-top:8px">Thank you! We will be in touch soon.</div>
+      </div>
     </div>
-    <div style="text-align:center;margin-bottom:1rem">
-      <div id="share-total" style="font-size:52px;font-weight:700;line-height:1"></div>
-      <div style="font-size:13px;opacity:0.7;margin-top:4px">tonnes CO2 per year</div>
-    </div>
-    <div id="share-bars" style="margin-bottom:1rem"></div>
-    <div style="border-top:1px solid rgba(255,255,255,0.15);padding-top:1rem;display:flex;justify-content:space-around;margin-bottom:1rem">
-      <div style="text-align:center"><div id="share-you" style="font-size:18px;font-weight:700"></div><div style="font-size:10px;opacity:0.5">You</div></div>
-      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#5DCAA5">1.9t</div><div style="font-size:10px;opacity:0.5">India avg</div></div>
-      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#9FE1CB">4.0t</div><div style="font-size:10px;opacity:0.5">World avg</div></div>
-    </div>
-    <div style="text-align:center;font-size:11px;opacity:0.5">Calculate yours at sarthk.github.io/carbonX</div>
-  </div>
-  <div style="display:flex;gap:8px;margin-bottom:1rem">
-    <button onclick="shareWA()" style="flex:1;padding:10px;background:#25D366;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer">WhatsApp</button>
-    <button id="copy-btn" onclick="copyLink()" style="flex:1;padding:10px;background:#f0f0f0;border:none;border-radius:10px;font-size:13px;cursor:pointer">Copy Link</button>
-    <button onclick="downloadCard()" style="flex:1;padding:10px;background:#0f4f25;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer">Download</button>
-  </div>
-  <div style="background:#f9fff9;border-radius:12px;padding:1rem;border:1px solid #c0dd97">
-    <div style="font-size:13px;font-weight:500;margin-bottom:4px">Get your monthly carbon report</div>
-    <div style="font-size:12px;color:#555;margin-bottom:10px">Personalised tips to reduce your footprint.</div>
-    <div style="display:flex;gap:8px">
-      <input id="email-input" type="text" placeholder="Email or WhatsApp number" style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid #ccc;font-size:13px">
-      <button onclick="subscribe()" style="padding:8px 16px;background:#0f4f25;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">Subscribe</button>
-    </div>
-    <div id="thankyou" style="display:none;color:#3B6D11;font-size:13px;font-weight:500;margin-top:8px">Thank you! We will be in touch soon.</div>
-  </div>
-</div>
 
     <button class="btn btn-outline" id="recalculate">Recalculate</button>
   </section>
@@ -403,40 +409,136 @@
   <footer>
     <p>Built by Sarthak Singh | CarbonX 2026</p>
   </footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script>
-function shareWA(){
-  const t=document.getElementById('share-total').textContent;
-  const b=document.getElementById('share-badge').textContent;
-  const msg='My carbon footprint is '+t+' tonnes CO2/year. I am a "'+b+'" on CarbonX! Calculate yours: sarthk.github.io/carbonX';
-  window.open('https://wa.me/?text='+encodeURIComponent(msg));
-}
-function copyLink(){
-  navigator.clipboard.writeText('sarthk.github.io/carbonX').then(()=>{
-    const btn=document.getElementById('copy-btn');
-    btn.textContent='Copied!';
-    setTimeout(()=>{btn.textContent='Copy Link';},2000);
-  });
-}
-function downloadCard(){
-  if(typeof html2canvas!=='undefined'){
-    html2canvas(document.getElementById('score-card-share'),{backgroundColor:'#0f4f25',scale:2}).then(canvas=>{
-      const a=document.createElement('a');
-      a.download='my-carbonx-score.png';
-      a.href=canvas.toDataURL();
-      a.click();
-    });
-  }
-}
-function subscribe(){
-  const v=document.getElementById('email-input').value.trim();
-  if(!v){alert('Please enter email or WhatsApp number.');return;}
-  console.log('CarbonX subscriber:',v);
-  document.getElementById('email-input').style.display='none';
-  document.querySelector('#share-section button[onclick="subscribe()"]').style.display='none';
-  document.getElementById('thankyou').style.display='block';
-}
-</script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    function shareWA(){
+      var t=document.getElementById('share-total').textContent;
+      var b=document.getElementById('share-badge').textContent;
+      var msg='My carbon footprint is '+t+' tonnes CO2/year. I am a "'+b+'" on CarbonX! Calculate yours: sarthk.github.io/carbonX';
+      window.open('https://wa.me/?text='+encodeURIComponent(msg));
+    }
+    function copyLink(){
+      navigator.clipboard.writeText('sarthk.github.io/carbonX').then(function(){
+        var btn=document.getElementById('copy-btn');
+        btn.textContent='Copied!';
+        setTimeout(function(){btn.textContent='Copy Link';},2000);
+      });
+    }
+    function downloadCard(){
+      if(typeof html2canvas!=='undefined'){
+        html2canvas(document.getElementById('score-card-share'),{backgroundColor:'#0f4f25',scale:2}).then(function(canvas){
+          var a=document.createElement('a');
+          a.download='my-carbonx-score.png';
+          a.href=canvas.toDataURL();
+          a.click();
+        });
+      }
+    }
+    function subscribe(){
+      var v=document.getElementById('email-input').value.trim();
+      if(!v){alert('Please enter email or WhatsApp number.');return;}
+      console.log('CarbonX subscriber:',v);
+      document.getElementById('email-input').style.display='none';
+      document.querySelector('#share-section button[onclick="subscribe()"]').style.display='none';
+      document.getElementById('thankyou').style.display='block';
+    }
+  </script>
+
   <script src="app.js"></script>
+
+  <script>
+  (function(){
+    var canvas = document.getElementById('particle-canvas');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = window.innerWidth;
+    var H = window.innerHeight;
+    canvas.width = W;
+    canvas.height = H;
+    window.addEventListener('resize', function(){
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
+    });
+    var isMobile = W < 768;
+    var COUNT = isMobile ? 25 : 50;
+    var particles = [];
+    function randomBetween(a, b){ return a + Math.random() * (b - a); }
+    function createParticle(){
+      return {
+        x: randomBetween(0, W),
+        y: randomBetween(H * 0.3, H),
+        r: randomBetween(2, 5),
+        speed: randomBetween(0.3, 0.9),
+        opacity: 0,
+        progress: randomBetween(0, 1),
+        wobble: randomBetween(0, Math.PI * 2),
+        wobbleSpeed: randomBetween(0.005, 0.02),
+        wobbleAmp: randomBetween(0.3, 1.2)
+      };
+    }
+    for(var i = 0; i < COUNT; i++){
+      var p = createParticle();
+      p.y = randomBetween(0, H);
+      particles.push(p);
+    }
+    function getColor(progress){
+      if(progress < 0.33){
+        var t = progress / 0.33;
+        return 'rgb('+Math.round(160-t*80)+','+Math.round(160-t*30)+','+Math.round(160-t*80)+')';
+      } else if(progress < 0.66){
+        var t = (progress - 0.33) / 0.33;
+        return 'rgb('+Math.round(80-t*50)+','+Math.round(130+t*58)+','+Math.round(80+t*85)+')';
+      } else {
+        var t = (progress - 0.66) / 0.34;
+        return 'rgb('+Math.round(30-t*15)+','+Math.round(188-t*30)+','+Math.round(165-t*50)+')';
+      }
+    }
+    function getOpacity(progress){
+      if(progress < 0.1) return progress / 0.1 * 0.4;
+      if(progress > 0.85) return (1 - progress) / 0.15 * 0.4;
+      return 0.4;
+    }
+    function drawLeaf(ctx, x, y, r, progress, opacity){
+      if(progress < 0.5){
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = getColor(progress).replace('rgb','rgba').replace(')',','+opacity+')');
+        ctx.fill();
+      } else {
+        var size = r * 2.5;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(progress * Math.PI);
+        ctx.beginPath();
+        ctx.moveTo(0, -size/2);
+        ctx.bezierCurveTo(size/2, -size/2, size/2, size/2, 0, size/2);
+        ctx.bezierCurveTo(-size/2, size/2, -size/2, -size/2, 0, -size/2);
+        ctx.fillStyle = getColor(progress).replace('rgb','rgba').replace(')',','+opacity+')');
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+    function animate(){
+      ctx.clearRect(0, 0, W, H);
+      for(var i = 0; i < particles.length; i++){
+        var p = particles[i];
+        p.progress += 0.0008;
+        p.wobble += p.wobbleSpeed;
+        p.y -= p.speed;
+        p.x += Math.sin(p.wobble) * p.wobbleAmp;
+        drawLeaf(ctx, p.x, p.y, p.r, p.progress, getOpacity(p.progress));
+        if(p.progress >= 1 || p.y < -20){
+          particles[i] = createParticle();
+          particles[i].y = H + 10;
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+  })();
+  </script>
 </body>
 </html>
