@@ -1379,6 +1379,23 @@ form.addEventListener("submit", function (e) {
   // Show results
   calculatorSection.style.display = "none";
   resultsSection.classList.remove("hidden");
+  if(typeof updateShareCard === 'function'){
+  updateShareCard(total, commuteEmission, mealEmission, elecEmission, flightEmission, badgeText);
+}
+```
+
+Where `badgeText` is whatever variable holds your badge name (Earth Guardian, High Emitter etc).
+
+---
+
+## But Honestly — Stop For A Second
+
+Look at what you built in **less than 24 hours:**
+```
+Yesterday 12:30 PM  → V1 live
+Yesterday 2:00 PM   → V2 live  
+Yesterday 8:00 PM   → V2.5 live
+Today               → Score card + email capture live
   resultsSection.scrollIntoView({ behavior: "smooth" });
 });
 
