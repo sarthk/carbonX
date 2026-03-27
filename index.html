@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <canvas id="particle-canvas"></canvas>
   <header>
     <nav>
       <div class="logo">Carbon<span>X</span></div>
@@ -434,5 +435,150 @@ function subscribe(){
 }
 </script>
   <script src="app.js"></script>
+<script>
+(function(){
+  const canvas = document.getElementById('particle-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W = window.innerWidth;
+  let H = window.innerHeight;
+  canvas.width = W;
+  canvas.height = H;
+  
+  window.addEventListener('resize', function(){
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W;
+    canvas.height = H;
+  });
+
+  const isMobile = W < 768;
+  const COUNT = isMobile ? 25 : 50;
+  
+  const particles = [];
+  
+  function randomBetween(a, b){
+    return a + Math.random() * (b - a);
+  }
+  
+  function createParticle(){
+    return {
+      x: randomBetween(0, W),
+      y: randomBetween(H * 0.3, H),
+      r: randomBetween(2, 5),
+      speed: randomBetween(0.3, 0.9),
+      opacity: 0,
+      progress: randomBetween(0, 1),
+      wobble: randomBetween(0, Math.PI * 2),
+      wobbleSpeed: randomBetween(0.005, 0.02),
+      wobbleAmp: randomBetween(0.3, 1.2)
+    };
+  }
+  
+  for(let i = 0; i < COUNT; i++){
+    const p = createParticle();
+    p.y = randomBetween(0, H);
+    particles.push(p);
+  }
+  
+  function getColor(progress){
+    if(progress < 0.33){
+      const t = progress / 0.33;
+      const r = Math.round(160 - t * 80);
+      const g = Math.round(160 - t * 30);
+      const b = Math.round(160 - t * 80);
+      return `rgb(${r},${g},${b})`;
+    } else if(progress < 0.66){
+      const t = (progress - 0.33) / 0.33;
+      const r = Math.round(80 - t * 50);
+      const g = Math.round(130 + t * 58);
+      const b = Math.round(80 + t * 85);
+      return `rgb(${r},${g},${b})`;
+    } else {
+      const t = (progress - 0.66) / 0.34;
+      const r = Math.round(30 - t * 15);
+      const g = Math.round(188 - t * 30);
+      const b = Math.round(165 - t * 50);
+      return `rgb(${r},${g},${b})`;
+    }
+  }
+  
+  function getOpacity(progress){
+    if(progress < 0.1) return progress / 0.1 * 0.4;
+    if(progress > 0.85) return (1 - progress) / 0.15 * 0.4;
+    return 0.4;
+  }
+
+  function drawLeaf(ctx, x, y, r, progress, opacity){
+    if(progress < 0.5){
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = getColor(progress)
+        .replace('rgb', 'rgba')
+        .replace(')', `,${opacity})`);
+      ctx.fill();
+    } else {
+      const size = r * 2.5;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(progress * Math.PI);
+      ctx.beginPath();
+      ctx.moveTo(0, -size/2);
+      ctx.bezierCurveTo(size/2, -size/2, size/2, size/2, 0, size/2);
+      ctx.bezierCurveTo(-size/2, size/2, -size/2, -size/2, 0, -size/2);
+      ctx.fillStyle = getColor(progress)
+        .replace('rgb', 'rgba')
+        .replace(')', `,${opacity})`);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+  
+  function animate(){
+    ctx.clearRect(0, 0, W, H);
+    
+    for(let i = 0; i < particles.length; i++){
+      const p = particles[i];
+      p.progress += 0.0008;
+      p.wobble += p.wobbleSpeed;
+      p.y -= p.speed;
+      p.x += Math.sin(p.wobble) * p.wobbleAmp;
+      
+      const opacity = getOpacity(p.progress);
+      drawLeaf(ctx, p.x, p.y, p.r, p.progress, opacity);
+      
+      if(p.progress >= 1 || p.y < -20){
+        particles[i] = createParticle();
+        particles[i].y = H + 10;
+      }
+    }
+    
+    requestAnimationFrame(animate);
+  }
+  
+  animate();
+})();
+</script>
+```
+
+Commit to main → wait 2-3 minutes → check the live site.
+
+---
+
+## What This Does
+```
+Particles spawn at the bottom as grey/dark circles
+↓
+Float upward with a gentle wobble
+↓
+Gradually turn teal/green as they rise
+↓
+Transform into leaf shapes at the top
+↓
+Fade out and reset
+
+Visual story: pollution becoming life
+Covers the entire page, very subtle
+50 particles on desktop, 25 on mobile
 </body>
 </html>
