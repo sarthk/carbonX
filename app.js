@@ -92,6 +92,156 @@
   animate();
 })();
 
+// Full-page rising particle background (grey → green transition)
+(function () {
+  var canvas = document.getElementById("bg-particles");
+  if (!canvas) return;
+  var ctx = canvas.getContext("2d");
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  var isMobile = window.innerWidth < 768;
+  var PARTICLE_COUNT = isMobile ? 20 : 40;
+  var particles = [];
+
+  function createParticle(randomY) {
+    return {
+      x: Math.random() * canvas.width,
+      y: randomY ? Math.random() * canvas.height : canvas.height + Math.random() * 20,
+      radius: 3 + Math.random() * 3,
+      speed: 0.3 + Math.random() * 0.5
+    };
+  }
+
+  for (var i = 0; i < PARTICLE_COUNT; i++) {
+    particles.push(createParticle(true));
+  }
+
+  function getColor(progress) {
+    // progress: 0 = bottom, 1 = top
+    var r, g, b;
+    if (progress < 0.5) {
+      // grey #888 (136,136,136) → light green #5DCAA5 (93,202,165)
+      var t = progress / 0.5;
+      r = 136 + (93 - 136) * t;
+      g = 136 + (202 - 136) * t;
+      b = 136 + (165 - 136) * t;
+    } else {
+      // light green #5DCAA5 (93,202,165) → bright green #1D9E75 (29,158,117)
+      var t = (progress - 0.5) / 0.5;
+      r = 93 + (29 - 93) * t;
+      g = 202 + (158 - 202) * t;
+      b = 165 + (117 - 165) * t;
+    }
+    return "rgb(" + Math.round(r) + "," + Math.round(g) + "," + Math.round(b) + ")";
+  }
+
+  function getOpacity(progress) {
+    // fade in from 0→0.2, hold, fade out near top
+    if (progress < 0.1) return progress / 0.1 * 0.18;
+    if (progress > 0.85) return (1 - progress) / 0.15 * 0.18;
+    return 0.18;
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var j = 0; j < particles.length; j++) {
+      var p = particles[j];
+      p.y -= p.speed;
+      p.x += Math.sin(p.y * 0.008 + j) * 0.2;
+
+      if (p.y < -20) {
+        particles[j] = createParticle(false);
+        continue;
+      }
+
+      var progress = 1 - (p.y / canvas.height);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = getColor(progress);
+      ctx.globalAlpha = getOpacity(progress);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// Full-page floating leaf particles (extends hero leaves to entire page)
+(function () {
+  var canvas = document.getElementById("fullpage-leaf-canvas");
+  if (!canvas) return;
+  var ctx = canvas.getContext("2d");
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  var leaves = [];
+  var LEAF_COUNT = 12;
+  var COLORS = ["#22c55e", "#4ade80", "#86efac", "#16a34a", "#bbf7d0"];
+
+  function createLeaf() {
+    return {
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 40,
+      size: 6 + Math.random() * 10,
+      speedY: 0.3 + Math.random() * 0.6,
+      speedX: (Math.random() - 0.5) * 0.5,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.02,
+      opacity: 0.08 + Math.random() * 0.12,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)]
+    };
+  }
+
+  for (var i = 0; i < LEAF_COUNT; i++) {
+    var l = createLeaf();
+    l.y = Math.random() * canvas.height;
+    leaves.push(l);
+  }
+
+  function drawLeaf(l) {
+    ctx.save();
+    ctx.translate(l.x, l.y);
+    ctx.rotate(l.rotation);
+    ctx.globalAlpha = l.opacity;
+    ctx.fillStyle = l.color;
+    ctx.beginPath();
+    ctx.moveTo(0, -l.size);
+    ctx.bezierCurveTo(l.size * 0.6, -l.size * 0.6, l.size * 0.6, l.size * 0.3, 0, l.size);
+    ctx.bezierCurveTo(-l.size * 0.6, l.size * 0.3, -l.size * 0.6, -l.size * 0.6, 0, -l.size);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var j = 0; j < leaves.length; j++) {
+      var l = leaves[j];
+      l.y += l.speedY;
+      l.x += l.speedX + Math.sin(l.y * 0.01) * 0.3;
+      l.rotation += l.rotSpeed;
+
+      if (l.y > canvas.height + 20) {
+        leaves[j] = createLeaf();
+      }
+      drawLeaf(l);
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
 // ============================================================
 // CarbonX App — Part 1: Vehicle Database & Cascade Dropdowns
 // ============================================================
