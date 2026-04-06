@@ -203,6 +203,20 @@ var DB = {
       ["Magna", "1197cc", "petrol", 20.7, "kmpl"],
       ["Sportz", "1197cc", "petrol", 20.7, "kmpl"],
       ["Sportz CNG", "1197cc", "cng", 28.3, "km/kg"]
+    ],
+    "Creta EV [EV]": [
+      ["Executive", "electric", "electric", 6.2, "km/kWh"],
+      ["Smart", "electric", "electric", 6.2, "km/kWh"],
+      ["Premium", "electric", "electric", 6.2, "km/kWh"]
+    ],
+    "Ioniq 5 [EV]": [
+      ["Standard Range", "electric", "electric", 5.8, "km/kWh"],
+      ["Long Range", "electric", "electric", 5.8, "km/kWh"],
+      ["Long Range AWD", "electric", "electric", 5.8, "km/kWh"]
+    ],
+    "Kona EV [EV]": [
+      ["Premium", "electric", "electric", 6.5, "km/kWh"],
+      ["Premium Dual Tone", "electric", "electric", 6.5, "km/kWh"]
     ]
   },
   "Tata Motors": {
@@ -250,20 +264,30 @@ var DB = {
       ["XZ+", "1199cc", "petrol", 20.0, "kmpl"],
       ["XZ CNG", "1199cc", "cng", 26.5, "km/kg"]
     ],
-    "Nexon EV": [
-      ["Creative+ LR", "electric", "electric", 3.93, "km/kWh"],
-      ["Fearless+ LR", "electric", "electric", 3.93, "km/kWh"],
-      ["Empowered+ LR", "electric", "electric", 3.93, "km/kWh"]
+    "Nexon EV [EV]": [
+      ["Creative+ LR", "electric", "electric", 6.5, "km/kWh"],
+      ["Fearless+ LR", "electric", "electric", 6.5, "km/kWh"],
+      ["Empowered+ LR", "electric", "electric", 6.5, "km/kWh"]
     ],
-    "Punch EV": [
-      ["Adventure", "electric", "electric", 4.0, "km/kWh"],
-      ["Accomplished", "electric", "electric", 4.0, "km/kWh"],
-      ["Creative", "electric", "electric", 4.0, "km/kWh"]
+    "Punch EV [EV]": [
+      ["Adventure", "electric", "electric", 7.0, "km/kWh"],
+      ["Accomplished", "electric", "electric", 7.0, "km/kWh"],
+      ["Creative", "electric", "electric", 7.0, "km/kWh"]
     ],
-    "Tiago EV": [
-      ["XE MR", "electric", "electric", 4.5, "km/kWh"],
-      ["XT LR", "electric", "electric", 4.5, "km/kWh"],
-      ["XZ+ LR", "electric", "electric", 4.5, "km/kWh"]
+    "Tiago EV [EV]": [
+      ["XE MR", "electric", "electric", 7.2, "km/kWh"],
+      ["XT LR", "electric", "electric", 7.2, "km/kWh"],
+      ["XZ+ LR", "electric", "electric", 7.2, "km/kWh"]
+    ],
+    "Tigor EV [EV]": [
+      ["XE", "electric", "electric", 6.8, "km/kWh"],
+      ["XM", "electric", "electric", 6.8, "km/kWh"],
+      ["XZ+", "electric", "electric", 6.8, "km/kWh"]
+    ],
+    "Curvv EV [EV]": [
+      ["Creative", "electric", "electric", 6.2, "km/kWh"],
+      ["Accomplished", "electric", "electric", 6.2, "km/kWh"],
+      ["Empowered+", "electric", "electric", 6.2, "km/kWh"]
     ]
   },
   "Mahindra": {
@@ -297,7 +321,7 @@ var DB = {
       ["B6", "1493cc", "diesel", 16.0, "kmpl"],
       ["B6(O)", "1493cc", "diesel", 16.0, "kmpl"]
     ],
-    "XUV400 EV": [
+    "XUV400 EV [EV]": [
       ["EC", "electric", "electric", 4.0, "km/kWh"],
       ["EL", "electric", "electric", 4.0, "km/kWh"],
       ["EL Pro", "electric", "electric", 4.0, "km/kWh"]
@@ -323,10 +347,14 @@ var DB = {
       ["Luxury", "1497cc", "petrol", 16.5, "kmpl"],
       ["Luxury+ Diesel", "1493cc", "diesel", 21.3, "kmpl"]
     ],
-    "EV6": [
-      ["GT-Line", "electric", "electric", 4.8, "km/kWh"],
-      ["GT-Line AWD", "electric", "electric", 4.3, "km/kWh"],
-      ["GT AWD", "electric", "electric", 3.9, "km/kWh"]
+    "EV6 [EV]": [
+      ["GT-Line", "electric", "electric", 5.8, "km/kWh"],
+      ["GT-Line AWD", "electric", "electric", 5.8, "km/kWh"],
+      ["GT AWD", "electric", "electric", 5.8, "km/kWh"]
+    ],
+    "EV9 [EV]": [
+      ["GT-Line", "electric", "electric", 5.2, "km/kWh"],
+      ["GT-Line AWD", "electric", "electric", 5.2, "km/kWh"]
     ]
   },
   "Toyota": {
@@ -404,14 +432,19 @@ var DB = {
       ["Smart", "1349cc turbo", "petrol", 15.0, "kmpl"],
       ["Sharp", "1498cc", "petrol", 14.2, "kmpl"]
     ],
-    "ZS EV": [
-      ["Excite", "electric", "electric", 5.0, "km/kWh"],
-      ["Exclusive", "electric", "electric", 5.0, "km/kWh"],
-      ["Exclusive Pro", "electric", "electric", 5.0, "km/kWh"]
+    "ZS EV [EV]": [
+      ["Excite", "electric", "electric", 6.0, "km/kWh"],
+      ["Exclusive", "electric", "electric", 6.0, "km/kWh"],
+      ["Exclusive Pro", "electric", "electric", 6.0, "km/kWh"]
     ],
-    "Comet EV": [
-      ["Lite", "electric", "electric", 6.5, "km/kWh"],
-      ["Play", "electric", "electric", 6.5, "km/kWh"]
+    "Comet EV [EV]": [
+      ["Lite", "electric", "electric", 8.5, "km/kWh"],
+      ["Play", "electric", "electric", 8.5, "km/kWh"]
+    ],
+    "Windsor EV [EV]": [
+      ["Excite", "electric", "electric", 6.8, "km/kWh"],
+      ["Exclusive", "electric", "electric", 6.8, "km/kWh"],
+      ["Exclusive Pro", "electric", "electric", 6.8, "km/kWh"]
     ]
   },
   "Renault": {
@@ -460,71 +493,444 @@ var DB = {
     ]
   },
   "Hero MotoCorp (2W)": {
-    "Splendor+": [
-      ["Kick", "97.2cc", "petrol", 70.0, "kmpl"],
-      ["Self", "97.2cc", "petrol", 70.0, "kmpl"],
-      ["Black & Accent", "97.2cc", "petrol", 70.0, "kmpl"]
+    "Splendor Plus": [
+      ["Kick", "97.2cc", "petrol", 60.0, "kmpl"],
+      ["Self", "97.2cc", "petrol", 60.0, "kmpl"],
+      ["Black & Accent", "97.2cc", "petrol", 60.0, "kmpl"]
     ],
     "HF Deluxe": [
-      ["Kick", "97.2cc", "petrol", 70.0, "kmpl"],
-      ["Self", "97.2cc", "petrol", 70.0, "kmpl"],
-      ["i3S", "97.2cc", "petrol", 70.0, "kmpl"]
+      ["Kick", "97.2cc", "petrol", 65.0, "kmpl"],
+      ["Self", "97.2cc", "petrol", 65.0, "kmpl"],
+      ["i3S", "97.2cc", "petrol", 65.0, "kmpl"]
     ],
     "Passion Pro": [
-      ["Drum", "113.2cc", "petrol", 60.0, "kmpl"],
-      ["Disc", "113.2cc", "petrol", 60.0, "kmpl"]
+      ["Drum", "113.2cc", "petrol", 55.0, "kmpl"],
+      ["Disc", "113.2cc", "petrol", 55.0, "kmpl"]
+    ],
+    "Glamour": [
+      ["Drum", "124.7cc", "petrol", 50.0, "kmpl"],
+      ["Disc", "124.7cc", "petrol", 50.0, "kmpl"],
+      ["Disc Self", "124.7cc", "petrol", 50.0, "kmpl"]
+    ],
+    "Xtreme 160R": [
+      ["Standard", "163cc", "petrol", 45.0, "kmpl"],
+      ["Double Disc", "163cc", "petrol", 45.0, "kmpl"]
     ]
   },
   "Bajaj (2W)": {
-    "Pulsar NS200": [
-      ["Standard", "199.5cc", "petrol", 40.0, "kmpl"],
-      ["ABS", "199.5cc", "petrol", 40.0, "kmpl"]
-    ],
     "Pulsar 150": [
-      ["Standard", "149.5cc", "petrol", 50.0, "kmpl"],
-      ["Twin Disc", "149.5cc", "petrol", 50.0, "kmpl"]
+      ["Standard", "149.5cc", "petrol", 45.0, "kmpl"],
+      ["Twin Disc", "149.5cc", "petrol", 45.0, "kmpl"]
     ],
-    "CT100": [
-      ["KS Alloy", "102cc", "petrol", 75.0, "kmpl"],
-      ["ES Alloy", "102cc", "petrol", 75.0, "kmpl"]
+    "Pulsar NS200": [
+      ["Standard", "199.5cc", "petrol", 35.0, "kmpl"],
+      ["ABS", "199.5cc", "petrol", 35.0, "kmpl"]
+    ],
+    "Platina": [
+      ["Drum", "102cc", "petrol", 80.0, "kmpl"],
+      ["Disc", "102cc", "petrol", 80.0, "kmpl"]
+    ],
+    "CT 110": [
+      ["KS", "115.45cc", "petrol", 70.0, "kmpl"],
+      ["ES Alloy", "115.45cc", "petrol", 70.0, "kmpl"]
+    ],
+    "Dominar 400": [
+      ["Standard", "373.3cc", "petrol", 30.0, "kmpl"],
+      ["Touring", "373.3cc", "petrol", 30.0, "kmpl"]
     ]
   },
   "TVS (2W)": {
+    "Jupiter": [
+      ["Standard", "109.7cc", "petrol", 50.0, "kmpl"],
+      ["ZX", "109.7cc", "petrol", 50.0, "kmpl"],
+      ["Classic", "109.7cc", "petrol", 50.0, "kmpl"]
+    ],
     "Apache RTR 160": [
-      ["Drum", "159.7cc", "petrol", 48.0, "kmpl"],
-      ["Disc", "159.7cc", "petrol", 48.0, "kmpl"],
+      ["Drum", "159.7cc", "petrol", 45.0, "kmpl"],
+      ["Disc", "159.7cc", "petrol", 45.0, "kmpl"],
       ["4V", "159.7cc", "petrol", 45.0, "kmpl"]
     ],
-    "Jupiter": [
-      ["Standard", "109.7cc", "petrol", 55.0, "kmpl"],
-      ["ZX", "109.7cc", "petrol", 55.0, "kmpl"],
-      ["Classic", "109.7cc", "petrol", 55.0, "kmpl"]
+    "Star City+": [
+      ["Drum", "109.7cc", "petrol", 60.0, "kmpl"],
+      ["Disc", "109.7cc", "petrol", 60.0, "kmpl"]
+    ],
+    "Raider 125": [
+      ["Drum", "124.8cc", "petrol", 55.0, "kmpl"],
+      ["Disc", "124.8cc", "petrol", 55.0, "kmpl"]
     ],
     "Ntorq": [
       ["Race XP", "124.8cc", "petrol", 45.0, "kmpl"],
       ["Super Squad", "124.8cc", "petrol", 45.0, "kmpl"]
     ]
   },
-  "Ola Electric": {
-    "S1 Pro": [
-      ["S1 Pro", "electric", "electric", 9.0, "km/kWh"],
-      ["S1 Pro+", "electric", "electric", 9.0, "km/kWh"]
+  "Ola Electric (2W)": {
+    "S1 Pro [EV]": [
+      ["S1 Pro", "electric", "electric", 4.5, "km/kWh"],
+      ["S1 Pro+", "electric", "electric", 4.5, "km/kWh"]
     ],
-    "S1 Air": [
-      ["S1 Air", "electric", "electric", 10.0, "km/kWh"]
+    "S1 Air [EV]": [
+      ["S1 Air", "electric", "electric", 4.8, "km/kWh"]
     ],
     "S1 X": [
-      ["2 kWh", "electric", "electric", 10.5, "km/kWh"],
-      ["3 kWh", "electric", "electric", 10.5, "km/kWh"]
+      ["2 kWh", "electric", "electric", 4.8, "km/kWh"],
+      ["3 kWh", "electric", "electric", 4.8, "km/kWh"]
     ]
   },
-  "Ather Energy": {
-    "450X": [
-      ["450X", "electric", "electric", 9.5, "km/kWh"],
-      ["450X Gen 3", "electric", "electric", 9.5, "km/kWh"]
+  "Ather Energy (2W)": {
+    "450X [EV]": [
+      ["450X", "electric", "electric", 4.5, "km/kWh"],
+      ["450X Gen 3", "electric", "electric", 4.5, "km/kWh"]
+    ],
+    "450 Apex [EV]": [
+      ["450 Apex", "electric", "electric", 4.3, "km/kWh"]
     ],
     "450S": [
-      ["450S", "electric", "electric", 10.0, "km/kWh"]
+      ["450S", "electric", "electric", 4.5, "km/kWh"]
+    ]
+  },
+  "BMW": {
+    "3 Series": [
+      ["320d Sport", "1995cc", "diesel", 13.0, "kmpl"],
+      ["320d Luxury", "1995cc", "diesel", 13.0, "kmpl"],
+      ["320Ld Luxury", "1995cc", "diesel", 13.0, "kmpl"]
+    ],
+    "5 Series": [
+      ["520d Sport", "1995cc", "diesel", 11.0, "kmpl"],
+      ["520d Luxury", "1995cc", "diesel", 11.0, "kmpl"],
+      ["530d M Sport", "2993cc", "diesel", 11.0, "kmpl"]
+    ],
+    "7 Series": [
+      ["740Li M Sport", "2998cc", "petrol", 9.0, "kmpl"],
+      ["730Ld DPE", "2993cc", "diesel", 9.0, "kmpl"]
+    ],
+    "X1": [
+      ["sDrive18i", "1499cc turbo", "petrol", 15.0, "kmpl"],
+      ["sDrive20d", "1995cc", "diesel", 15.0, "kmpl"],
+      ["sDrive20d M Sport", "1995cc", "diesel", 15.0, "kmpl"]
+    ],
+    "X3": [
+      ["xDrive20d", "1995cc", "diesel", 13.0, "kmpl"],
+      ["xDrive20d M Sport", "1995cc", "diesel", 13.0, "kmpl"],
+      ["xDrive30i M Sport", "1998cc turbo", "petrol", 13.0, "kmpl"]
+    ],
+    "X5": [
+      ["xDrive30d", "2993cc", "diesel", 10.0, "kmpl"],
+      ["xDrive30d M Sport", "2993cc", "diesel", 10.0, "kmpl"],
+      ["xDrive40i M Sport", "2998cc turbo", "petrol", 10.0, "kmpl"]
+    ],
+    "X7": [
+      ["xDrive30d", "2993cc", "diesel", 9.0, "kmpl"],
+      ["xDrive30d M Sport", "2993cc", "diesel", 9.0, "kmpl"],
+      ["xDrive40i M Sport", "2998cc turbo", "petrol", 9.0, "kmpl"]
+    ],
+    "i4 [EV]": [
+      ["eDrive40", "electric", "electric", 6.3, "km/kWh"],
+      ["M50", "electric", "electric", 6.3, "km/kWh"]
+    ],
+    "iX [EV]": [
+      ["xDrive40", "electric", "electric", 5.8, "km/kWh"],
+      ["xDrive50", "electric", "electric", 5.8, "km/kWh"]
+    ],
+    "iX1 [EV]": [
+      ["eDrive20", "electric", "electric", 6.5, "km/kWh"],
+      ["xDrive30", "electric", "electric", 6.5, "km/kWh"]
+    ]
+  },
+  "Mercedes-Benz": {
+    "A-Class": [
+      ["A 200", "1332cc turbo", "petrol", 15.0, "kmpl"],
+      ["A 200d", "1950cc", "diesel", 15.0, "kmpl"]
+    ],
+    "C-Class": [
+      ["C 200", "1496cc turbo", "petrol", 13.0, "kmpl"],
+      ["C 220d", "1993cc", "diesel", 13.0, "kmpl"],
+      ["C 300d", "1993cc", "diesel", 13.0, "kmpl"]
+    ],
+    "E-Class": [
+      ["E 200", "1991cc turbo", "petrol", 11.0, "kmpl"],
+      ["E 220d", "1950cc", "diesel", 11.0, "kmpl"],
+      ["E 350d", "2925cc", "diesel", 11.0, "kmpl"]
+    ],
+    "S-Class": [
+      ["S 350d", "2925cc", "diesel", 9.0, "kmpl"],
+      ["S 400d", "2925cc", "diesel", 9.0, "kmpl"],
+      ["S 450", "2999cc turbo", "petrol", 9.0, "kmpl"]
+    ],
+    "GLA": [
+      ["GLA 200", "1332cc turbo", "petrol", 14.0, "kmpl"],
+      ["GLA 200d", "1950cc", "diesel", 14.0, "kmpl"],
+      ["GLA 220d", "1950cc", "diesel", 14.0, "kmpl"]
+    ],
+    "GLC": [
+      ["GLC 200", "1991cc turbo", "petrol", 13.0, "kmpl"],
+      ["GLC 220d", "1993cc", "diesel", 13.0, "kmpl"],
+      ["GLC 300", "1991cc turbo", "petrol", 13.0, "kmpl"]
+    ],
+    "GLE": [
+      ["GLE 300d", "1950cc", "diesel", 10.0, "kmpl"],
+      ["GLE 400d", "2925cc", "diesel", 10.0, "kmpl"],
+      ["GLE 450", "2999cc turbo", "petrol", 10.0, "kmpl"]
+    ],
+    "EQS [EV]": [
+      ["EQS 580", "electric", "electric", 5.5, "km/kWh"],
+      ["EQS 450+", "electric", "electric", 5.5, "km/kWh"]
+    ],
+    "EQB [EV]": [
+      ["EQB 250+", "electric", "electric", 6.0, "km/kWh"],
+      ["EQB 350", "electric", "electric", 6.0, "km/kWh"]
+    ]
+  },
+  "Audi": {
+    "A4": [
+      ["Premium", "1984cc turbo", "petrol", 13.0, "kmpl"],
+      ["Premium Plus", "1984cc turbo", "petrol", 13.0, "kmpl"],
+      ["Technology", "1984cc turbo", "petrol", 13.0, "kmpl"]
+    ],
+    "A6": [
+      ["Premium Plus", "1984cc turbo", "petrol", 11.0, "kmpl"],
+      ["Technology", "1984cc turbo", "petrol", 11.0, "kmpl"]
+    ],
+    "Q3": [
+      ["Premium Plus", "1984cc turbo", "petrol", 14.0, "kmpl"],
+      ["Technology", "1984cc turbo", "petrol", 14.0, "kmpl"]
+    ],
+    "Q5": [
+      ["Premium Plus", "1984cc turbo", "petrol", 12.0, "kmpl"],
+      ["Technology", "1984cc turbo", "petrol", 12.0, "kmpl"]
+    ],
+    "Q7": [
+      ["Premium Plus", "2967cc", "diesel", 10.0, "kmpl"],
+      ["Technology", "2967cc", "diesel", 10.0, "kmpl"]
+    ],
+    "Q8": [
+      ["Celebration", "2995cc turbo", "petrol", 9.0, "kmpl"],
+      ["Technology", "2995cc turbo", "petrol", 9.0, "kmpl"]
+    ]
+  },
+  "Porsche": {
+    "Cayenne": [
+      ["Cayenne", "2995cc turbo", "petrol", 10.0, "kmpl"],
+      ["Cayenne S", "2894cc turbo", "petrol", 10.0, "kmpl"],
+      ["Cayenne GTS", "3996cc turbo", "petrol", 10.0, "kmpl"]
+    ],
+    "Macan": [
+      ["Macan", "1984cc turbo", "petrol", 13.0, "kmpl"],
+      ["Macan S", "2894cc turbo", "petrol", 13.0, "kmpl"]
+    ],
+    "Panamera": [
+      ["Panamera", "2894cc turbo", "petrol", 10.0, "kmpl"],
+      ["Panamera 4", "2894cc turbo", "petrol", 10.0, "kmpl"]
+    ]
+  },
+  "Jaguar": {
+    "XE": [
+      ["S", "1997cc turbo", "petrol", 14.0, "kmpl"],
+      ["SE", "1999cc", "diesel", 14.0, "kmpl"],
+      ["R-Dynamic", "1997cc turbo", "petrol", 14.0, "kmpl"]
+    ],
+    "XF": [
+      ["S", "1997cc turbo", "petrol", 12.0, "kmpl"],
+      ["SE", "1999cc", "diesel", 12.0, "kmpl"],
+      ["R-Dynamic", "1997cc turbo", "petrol", 12.0, "kmpl"]
+    ],
+    "F-Pace": [
+      ["S", "1997cc turbo", "petrol", 12.0, "kmpl"],
+      ["SE", "1999cc", "diesel", 12.0, "kmpl"],
+      ["R-Dynamic", "1997cc turbo", "petrol", 12.0, "kmpl"]
+    ]
+  },
+  "Land Rover": {
+    "Defender": [
+      ["90 X", "1997cc turbo", "petrol", 10.0, "kmpl"],
+      ["110 S", "1999cc", "diesel", 10.0, "kmpl"],
+      ["110 X", "2996cc", "petrol", 10.0, "kmpl"]
+    ],
+    "Discovery": [
+      ["S", "1999cc", "diesel", 9.0, "kmpl"],
+      ["SE", "2996cc", "petrol", 9.0, "kmpl"],
+      ["HSE", "2996cc", "petrol", 9.0, "kmpl"]
+    ],
+    "Range Rover Evoque": [
+      ["S", "1998cc turbo", "petrol", 13.0, "kmpl"],
+      ["SE", "1999cc", "diesel", 13.0, "kmpl"],
+      ["R-Dynamic", "1998cc turbo", "petrol", 13.0, "kmpl"]
+    ],
+    "Range Rover Sport": [
+      ["SE", "2996cc", "petrol", 9.0, "kmpl"],
+      ["HSE", "2996cc", "diesel", 9.0, "kmpl"],
+      ["Autobiography", "4395cc", "petrol", 9.0, "kmpl"]
+    ],
+    "Range Rover Vogue": [
+      ["SE", "2996cc", "diesel", 8.0, "kmpl"],
+      ["HSE", "4395cc", "petrol", 8.0, "kmpl"],
+      ["Autobiography", "4395cc", "petrol", 8.0, "kmpl"]
+    ]
+  },
+  "Volvo": {
+    "XC40": [
+      ["B4 Momentum", "1969cc turbo", "petrol", 14.0, "kmpl"],
+      ["B4 Inscription", "1969cc turbo", "petrol", 14.0, "kmpl"],
+      ["B4 R-Design", "1969cc turbo", "petrol", 14.0, "kmpl"]
+    ],
+    "XC60": [
+      ["B5 Momentum", "1969cc turbo", "petrol", 13.0, "kmpl"],
+      ["B5 Inscription", "1969cc turbo", "petrol", 13.0, "kmpl"],
+      ["B5 R-Design", "1969cc turbo", "petrol", 13.0, "kmpl"]
+    ],
+    "XC90": [
+      ["B5 Momentum", "1969cc turbo", "petrol", 11.0, "kmpl"],
+      ["B5 Inscription", "1969cc turbo", "petrol", 11.0, "kmpl"],
+      ["B6 R-Design", "1969cc turbo", "petrol", 11.0, "kmpl"]
+    ],
+    "XC40 Recharge [EV]": [
+      ["Single Motor", "electric", "electric", 5.8, "km/kWh"],
+      ["Twin Motor", "electric", "electric", 5.8, "km/kWh"]
+    ],
+    "C40 Recharge [EV]": [
+      ["Single Motor", "electric", "electric", 6.0, "km/kWh"],
+      ["Twin Motor", "electric", "electric", 6.0, "km/kWh"]
+    ]
+  },
+  "Lexus": {
+    "ES 300h": [
+      ["Exquisite", "2487cc hybrid", "petrol", 16.0, "kmpl"],
+      ["Luxury", "2487cc hybrid", "petrol", 16.0, "kmpl"]
+    ],
+    "NX 300h": [
+      ["Exquisite", "2494cc hybrid", "petrol", 17.0, "kmpl"],
+      ["Luxury", "2494cc hybrid", "petrol", 17.0, "kmpl"],
+      ["F-Sport", "2494cc hybrid", "petrol", 17.0, "kmpl"]
+    ],
+    "RX 450h": [
+      ["Luxury", "3456cc hybrid", "petrol", 15.0, "kmpl"],
+      ["F-Sport", "3456cc hybrid", "petrol", 15.0, "kmpl"]
+    ]
+  },
+  "BYD": {
+    "Seal [EV]": [
+      ["Dynamic", "electric", "electric", 6.5, "km/kWh"],
+      ["Premium", "electric", "electric", 6.5, "km/kWh"],
+      ["Performance", "electric", "electric", 6.5, "km/kWh"]
+    ],
+    "Atto 3 [EV]": [
+      ["Dynamic", "electric", "electric", 6.0, "km/kWh"],
+      ["Premium", "electric", "electric", 6.0, "km/kWh"]
+    ],
+    "Sealion 6 [EV]": [
+      ["Dynamic", "electric", "electric", 6.2, "km/kWh"],
+      ["Premium", "electric", "electric", 6.2, "km/kWh"]
+    ]
+  },
+  "Honda (2W)": {
+    "Activa 6G": [
+      ["Standard", "109.51cc", "petrol", 50.0, "kmpl"],
+      ["DLX", "109.51cc", "petrol", 50.0, "kmpl"]
+    ],
+    "Shine": [
+      ["Drum", "124cc", "petrol", 55.0, "kmpl"],
+      ["Disc", "124cc", "petrol", 55.0, "kmpl"]
+    ],
+    "Unicorn": [
+      ["Standard", "162.71cc", "petrol", 55.0, "kmpl"],
+      ["Disc", "162.71cc", "petrol", 55.0, "kmpl"]
+    ],
+    "CB Hornet 2.0": [
+      ["Standard", "184.4cc", "petrol", 40.0, "kmpl"],
+      ["Repsol", "184.4cc", "petrol", 40.0, "kmpl"]
+    ],
+    "SP 125": [
+      ["Drum", "124cc", "petrol", 60.0, "kmpl"],
+      ["Disc", "124cc", "petrol", 60.0, "kmpl"]
+    ]
+  },
+  "Royal Enfield (2W)": {
+    "Classic 350": [
+      ["Halcyon", "349cc", "petrol", 35.0, "kmpl"],
+      ["Signals", "349cc", "petrol", 35.0, "kmpl"],
+      ["Dark", "349cc", "petrol", 35.0, "kmpl"],
+      ["Chrome", "349cc", "petrol", 35.0, "kmpl"]
+    ],
+    "Bullet 350": [
+      ["Standard", "346cc", "petrol", 35.0, "kmpl"],
+      ["ES", "346cc", "petrol", 35.0, "kmpl"],
+      ["Military Silver", "346cc", "petrol", 35.0, "kmpl"]
+    ],
+    "Meteor 350": [
+      ["Fireball", "349cc", "petrol", 36.0, "kmpl"],
+      ["Stellar", "349cc", "petrol", 36.0, "kmpl"],
+      ["Supernova", "349cc", "petrol", 36.0, "kmpl"]
+    ],
+    "Himalayan": [
+      ["Standard", "411cc", "petrol", 30.0, "kmpl"],
+      ["Granite", "411cc", "petrol", 30.0, "kmpl"],
+      ["Sleet", "411cc", "petrol", 30.0, "kmpl"]
+    ],
+    "Hunter 350": [
+      ["Retro", "349cc", "petrol", 36.0, "kmpl"],
+      ["Metro", "349cc", "petrol", 36.0, "kmpl"],
+      ["Rebel", "349cc", "petrol", 36.0, "kmpl"]
+    ],
+    "Thunderbird": [
+      ["350", "346cc", "petrol", 30.0, "kmpl"],
+      ["350X", "346cc", "petrol", 30.0, "kmpl"]
+    ]
+  },
+  "Yamaha (2W)": {
+    "FZ-S": [
+      ["V3", "149cc", "petrol", 45.0, "kmpl"],
+      ["FI V4", "149cc", "petrol", 45.0, "kmpl"],
+      ["Dark Knight", "149cc", "petrol", 45.0, "kmpl"]
+    ],
+    "R15": [
+      ["V4", "155cc", "petrol", 40.0, "kmpl"],
+      ["V4 M", "155cc", "petrol", 40.0, "kmpl"],
+      ["V4 Racing Blue", "155cc", "petrol", 40.0, "kmpl"]
+    ],
+    "MT-15": [
+      ["V2", "155cc", "petrol", 40.0, "kmpl"],
+      ["V2 Dark", "155cc", "petrol", 40.0, "kmpl"]
+    ],
+    "Fascino": [
+      ["125 Fi", "125cc", "petrol", 55.0, "kmpl"],
+      ["125 Fi Hybrid", "125cc", "petrol", 55.0, "kmpl"]
+    ],
+    "Ray ZR": [
+      ["125 Fi", "125cc", "petrol", 55.0, "kmpl"],
+      ["125 Street Rally", "125cc", "petrol", 55.0, "kmpl"]
+    ]
+  },
+  "Suzuki (2W)": {
+    "Access 125": [
+      ["Standard", "124cc", "petrol", 50.0, "kmpl"],
+      ["Disc", "124cc", "petrol", 50.0, "kmpl"],
+      ["Special Edition", "124cc", "petrol", 50.0, "kmpl"]
+    ],
+    "Burgman Street": [
+      ["Standard", "124cc", "petrol", 45.0, "kmpl"],
+      ["EX", "124cc", "petrol", 45.0, "kmpl"]
+    ],
+    "Gixxer": [
+      ["Standard", "155cc", "petrol", 45.0, "kmpl"],
+      ["SF", "155cc", "petrol", 45.0, "kmpl"]
+    ]
+  },
+  "TVS iQube (2W)": {
+    "iQube [EV]": [
+      ["Standard", "electric", "electric", 4.8, "km/kWh"],
+      ["S", "electric", "electric", 4.8, "km/kWh"],
+      ["ST", "electric", "electric", 4.8, "km/kWh"]
+    ]
+  },
+  "Bajaj Chetak (2W)": {
+    "Chetak [EV]": [
+      ["Urbane", "electric", "electric", 4.5, "km/kWh"],
+      ["Premium", "electric", "electric", 4.5, "km/kWh"]
+    ]
+  },
+  "Revolt (2W)": {
+    "RV400 [EV]": [
+      ["Standard", "electric", "electric", 4.0, "km/kWh"],
+      ["Premium", "electric", "electric", 4.0, "km/kWh"]
     ]
   },
   "Public Transport": {
