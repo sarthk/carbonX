@@ -1096,49 +1096,375 @@ function calcCommuteEmission() {
 // ============================================================
 // Part 2: Meals & Electricity
 // ============================================================
-var MEAL_OPTIONS = [
-  ["", "Select meal", 0],
-  ["skip", "Skip this meal \u2014 0 kg CO2", 0],
-  ["poha", "Poha / Upma / Idli (veg breakfast) \u2014 0.3 kg CO2", 0.3],
-  ["paratha", "Paratha with butter \u2014 0.5 kg CO2", 0.5],
-  ["eggs", "Eggs (2) \u2014 0.6 kg CO2", 0.6],
-  ["bread-omelette", "Bread omelette \u2014 0.7 kg CO2", 0.7],
-  ["dal-rice", "Dal tadka + rice \u2014 0.4 kg CO2", 0.4],
-  ["rajma", "Rajma chawal \u2014 0.6 kg CO2", 0.6],
-  ["paneer", "Paneer butter masala + roti \u2014 1.1 kg CO2", 1.1],
-  ["chole", "Chole bhature \u2014 0.8 kg CO2", 0.8],
-  ["chicken-curry", "Chicken curry + rice \u2014 2.8 kg CO2", 2.8],
-  ["chicken-biryani", "Chicken biryani \u2014 3.5 kg CO2", 3.5],
-  ["mutton", "Mutton curry + rice \u2014 5.0 kg CO2", 5.0],
-  ["fish", "Fish curry + rice \u2014 1.8 kg CO2", 1.8],
-  ["veg-thali", "Veg thali (full) \u2014 0.5 kg CO2", 0.5],
-  ["nonveg-thali", "Non-veg thali (full) \u2014 2.5 kg CO2", 2.5],
-  ["fastfood", "Fast food (burger/pizza) \u2014 2.0 kg CO2", 2.0]
+// ---------- FOOD UI STYLES (injected) ----------
+(function () {
+  var s = document.createElement("style");
+  s.textContent =
+    ".food-slot-wrapper { margin-top: 0.5rem; }" +
+    ".food-search-wrap { position: relative; }" +
+    ".food-search-input { width: 100%; padding: 0.75rem 1rem; font-size: 1rem;" +
+    "  border: 2px solid #e5e7eb; border-radius: 12px; background: #fff; color: #1f2937;" +
+    "  transition: border-color 0.2s; outline: none; }" +
+    ".food-search-input:focus { border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.15); }" +
+    ".food-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 100;" +
+    "  background: #fff; border: 2px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;" +
+    "  max-height: 260px; overflow-y: auto; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }" +
+    ".food-dropdown-cat { padding: 0.35rem 0.75rem; font-size: 0.7rem; font-weight: 700;" +
+    "  text-transform: uppercase; letter-spacing: 0.05em; color: #16a34a; background: #f0fdf4; }" +
+    ".food-dropdown-item { padding: 0.5rem 0.75rem; cursor: pointer; display: flex;" +
+    "  justify-content: space-between; align-items: center; font-size: 0.9rem; }" +
+    ".food-dropdown-item:hover, .food-dropdown-item.active { background: #dcfce7; }" +
+    ".food-item-name { font-weight: 500; color: #1f2937; }" +
+    ".food-item-meta { font-size: 0.78rem; color: #4b5563; }" +
+    ".food-items-list { margin-top: 0.5rem; }" +
+    ".food-item-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0;" +
+    "  border-bottom: 1px solid #f3f4f6; flex-wrap: wrap; }" +
+    ".food-item-row:last-child { border-bottom: none; }" +
+    ".food-item-row-name { flex: 1; font-size: 0.9rem; font-weight: 500; color: #374151; min-width: 100px; }" +
+    ".food-item-row-controls { display: flex; align-items: center; gap: 0.25rem; }" +
+    ".food-qty-btn { width: 26px; height: 26px; border: 1px solid #e5e7eb; border-radius: 6px;" +
+    "  background: #f9fafb; cursor: pointer; font-size: 1rem; line-height: 1; display: flex;" +
+    "  align-items: center; justify-content: center; color: #374151; font-family: inherit; }" +
+    ".food-qty-btn:hover { background: #dcfce7; border-color: #22c55e; }" +
+    ".food-qty-input { width: 40px; text-align: center; padding: 0.2rem; border: 1px solid #e5e7eb;" +
+    "  border-radius: 6px; font-size: 0.85rem; font-family: inherit; }" +
+    ".food-qty-input:focus { outline: none; border-color: #22c55e; }" +
+    ".food-item-row-unit { font-size: 0.72rem; color: #6b7280; min-width: 55px; }" +
+    ".food-item-row-co2 { font-size: 0.85rem; font-weight: 600; color: #15803d; min-width: 60px; text-align: right; }" +
+    ".food-item-remove { background: none; border: none; color: #9ca3af; cursor: pointer;" +
+    "  font-size: 1.1rem; padding: 0 0.2rem; line-height: 1; }" +
+    ".food-item-remove:hover { color: #ef4444; }" +
+    ".food-slot-subtotal { margin-top: 0.35rem; font-size: 0.85rem; color: #4b5563;" +
+    "  padding: 0.25rem 0; }" +
+    ".food-slot-subtotal strong { color: #15803d; }" +
+    "@media (max-width: 768px) {" +
+    "  .food-item-row { gap: 0.3rem; }" +
+    "  .food-item-row-name { font-size: 0.82rem; min-width: 80px; }" +
+    "  .food-item-row-unit { display: none; }" +
+    "}";
+  document.head.appendChild(s);
+})();
+// ---------- EXPANDED FOOD DATABASE ----------
+// Each item: [name, co2_per_serving, unit_label, category]
+var FOOD_DB = [
+  // BREAKFAST
+  ["Boiled Egg", 0.2, "per egg", "breakfast"],
+  ["Scrambled Eggs", 0.22, "per egg", "breakfast"],
+  ["Omelette (2 eggs)", 0.45, "per serving", "breakfast"],
+  ["Paratha plain", 0.15, "per piece", "breakfast"],
+  ["Paratha with butter", 0.18, "per piece", "breakfast"],
+  ["Aloo Paratha", 0.2, "per piece", "breakfast"],
+  ["Idli", 0.05, "per piece", "breakfast"],
+  ["Dosa plain", 0.12, "per serving", "breakfast"],
+  ["Masala Dosa", 0.18, "per serving", "breakfast"],
+  ["Uttapam", 0.15, "per serving", "breakfast"],
+  ["Poha", 0.1, "per bowl", "breakfast"],
+  ["Upma", 0.1, "per bowl", "breakfast"],
+  ["White Bread toast", 0.04, "per slice", "breakfast"],
+  ["Brown Bread toast", 0.035, "per slice", "breakfast"],
+  ["Cornflakes with milk", 0.25, "per bowl", "breakfast"],
+  ["Oats with milk", 0.22, "per bowl", "breakfast"],
+  ["Banana", 0.08, "per piece", "breakfast"],
+  ["Apple", 0.07, "per piece", "breakfast"],
+  ["Curd/Yoghurt", 0.15, "per bowl", "breakfast"],
+  ["Tea with milk", 0.06, "per cup", "breakfast"],
+  ["Coffee with milk", 0.07, "per cup", "breakfast"],
+  ["Black Tea", 0.01, "per cup", "breakfast"],
+  ["Black Coffee", 0.01, "per cup", "breakfast"],
+  // LUNCH/DINNER
+  ["Dal Tadka", 0.2, "per bowl", "meal"],
+  ["Dal Makhani", 0.35, "per bowl", "meal"],
+  ["Rajma", 0.25, "per bowl", "meal"],
+  ["Chole", 0.28, "per bowl", "meal"],
+  ["Paneer Butter Masala", 0.45, "per serving", "meal"],
+  ["Shahi Paneer", 0.5, "per serving", "meal"],
+  ["Palak Paneer", 0.38, "per serving", "meal"],
+  ["Kadai Paneer", 0.42, "per serving", "meal"],
+  ["Chicken Curry", 0.55, "per serving", "meal"],
+  ["Butter Chicken", 0.6, "per serving", "meal"],
+  ["Chicken Biryani", 0.65, "per serving", "meal"],
+  ["Grilled Chicken", 0.5, "per serving", "meal"],
+  ["Mutton Curry", 0.85, "per serving", "meal"],
+  ["Mutton Biryani", 0.9, "per serving", "meal"],
+  ["Fish Curry", 0.4, "per serving", "meal"],
+  ["Prawns", 0.5, "per serving", "meal"],
+  ["Egg Curry", 0.35, "per serving", "meal"],
+  ["Egg Biryani", 0.4, "per serving", "meal"],
+  ["Veg Biryani", 0.3, "per serving", "meal"],
+  ["Veg Pulao", 0.25, "per serving", "meal"],
+  ["Jeera Rice", 0.2, "per bowl", "meal"],
+  ["Plain Rice", 0.18, "per bowl", "meal"],
+  ["Roti/Chapati", 0.05, "per piece", "meal"],
+  ["Naan", 0.08, "per piece", "meal"],
+  ["Puri", 0.07, "per piece", "meal"],
+  ["Sambar", 0.12, "per bowl", "meal"],
+  ["Rasam", 0.08, "per bowl", "meal"],
+  ["Aloo Sabzi", 0.12, "per serving", "meal"],
+  ["Bhindi", 0.1, "per serving", "meal"],
+  ["Gobi", 0.1, "per serving", "meal"],
+  ["Mixed Veg", 0.12, "per serving", "meal"],
+  ["Green Salad", 0.05, "per serving", "meal"],
+  ["Raita", 0.1, "per bowl", "meal"],
+  ["Pizza slice", 0.35, "per slice", "meal"],
+  ["Burger", 0.45, "per piece", "meal"],
+  ["Sandwich", 0.2, "per piece", "meal"],
+  ["Noodles", 0.22, "per serving", "meal"],
+  ["Pasta", 0.25, "per serving", "meal"],
+  ["Fried Rice", 0.28, "per serving", "meal"],
+  // SNACKS
+  ["Samosa", 0.12, "per piece", "snack"],
+  ["Pakora", 0.15, "per 4 pieces", "snack"],
+  ["Biscuits", 0.08, "per 4 pieces", "snack"],
+  ["Namkeen/Chips", 0.1, "per small pack", "snack"],
+  ["Fruit", 0.07, "per piece", "snack"],
+  ["Mixed Nuts", 0.1, "per handful", "snack"],
+  ["Cold drink/Soda", 0.05, "per glass", "snack"],
+  ["Juice", 0.08, "per glass", "snack"],
+  ["Lassi", 0.15, "per glass", "snack"]
 ];
-var MEAL_CO2 = {};
-MEAL_OPTIONS.forEach(function (m) { MEAL_CO2[m[0]] = m[2]; });
-var mealSelects = document.querySelectorAll(".meal-select");
-mealSelects.forEach(function (sel) {
-  MEAL_OPTIONS.forEach(function (m) {
-    var opt = document.createElement("option");
-    opt.value = m[0];
-    opt.textContent = m[1];
-    if (m[0] === "") { opt.disabled = true; opt.selected = true; }
-    sel.appendChild(opt);
+// Build lookup map: name -> co2
+var FOOD_CO2 = {};
+FOOD_DB.forEach(function (f) { FOOD_CO2[f[0]] = f[1]; });
+// Per-slot state: each meal slot stores array of {name, qty, co2}
+var mealSlotItems = {
+  "meal-breakfast": [],
+  "meal-lunch": [],
+  "meal-snack": [],
+  "meal-dinner": []
+};
+// Transform the original <select> elements into searchable autocomplete + quantity UI
+(function initFoodUI() {
+  var slotIds = ["meal-breakfast", "meal-lunch", "meal-snack", "meal-dinner"];
+  slotIds.forEach(function (slotId) {
+    var origSelect = document.getElementById(slotId);
+    if (!origSelect) return;
+    var formGroup = origSelect.parentElement;
+    var labelEl = formGroup.querySelector("label");
+    var labelText = labelEl ? labelEl.textContent : slotId;
+    // Hide the original select
+    origSelect.style.display = "none";
+    origSelect.removeAttribute("required");
+    // Create wrapper
+    var wrapper = document.createElement("div");
+    wrapper.className = "food-slot-wrapper";
+    wrapper.setAttribute("data-slot", slotId);
+    // Search input
+    var searchWrap = document.createElement("div");
+    searchWrap.className = "food-search-wrap";
+    var searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.className = "food-search-input";
+    searchInput.placeholder = "Search food items...";
+    searchInput.setAttribute("autocomplete", "off");
+    var dropdown = document.createElement("div");
+    dropdown.className = "food-dropdown hidden";
+    searchWrap.appendChild(searchInput);
+    searchWrap.appendChild(dropdown);
+    wrapper.appendChild(searchWrap);
+    // Items list for this slot
+    var itemsList = document.createElement("div");
+    itemsList.className = "food-items-list";
+    itemsList.setAttribute("data-slot", slotId);
+    wrapper.appendChild(itemsList);
+    // Slot CO2 subtotal
+    var subtotalEl = document.createElement("div");
+    subtotalEl.className = "food-slot-subtotal";
+    subtotalEl.innerHTML = '<span class="food-slot-label">' + labelText + ' CO2:</span> <strong>0</strong> kg';
+    wrapper.appendChild(subtotalEl);
+    formGroup.appendChild(wrapper);
+    // Populate dropdown on focus/input
+    function renderDropdown(query) {
+      dropdown.innerHTML = "";
+      var q = (query || "").toLowerCase().trim();
+      var matches = FOOD_DB.filter(function (f) {
+        return q === "" || f[0].toLowerCase().indexOf(q) !== -1;
+      });
+      if (matches.length === 0) {
+        dropdown.classList.add("hidden");
+        return;
+      }
+      var maxShow = 8;
+      var shown = 0;
+      // Group by category for display
+      var cats = { breakfast: "Breakfast", meal: "Lunch / Dinner", snack: "Snack" };
+      var grouped = {};
+      matches.forEach(function (f) {
+        var cat = f[3];
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(f);
+      });
+      Object.keys(cats).forEach(function (catKey) {
+        if (!grouped[catKey] || shown >= maxShow) return;
+        var catLabel = document.createElement("div");
+        catLabel.className = "food-dropdown-cat";
+        catLabel.textContent = cats[catKey];
+        dropdown.appendChild(catLabel);
+        grouped[catKey].forEach(function (f) {
+          if (shown >= maxShow) return;
+          var item = document.createElement("div");
+          item.className = "food-dropdown-item";
+          item.innerHTML = '<span class="food-item-name">' + f[0] + '</span>' +
+            '<span class="food-item-meta">' + f[1] + ' kg CO2 ' + f[2] + '</span>';
+          item.setAttribute("data-food-name", f[0]);
+          item.addEventListener("mousedown", function (e) {
+            e.preventDefault();
+            addFoodItem(slotId, f[0], 1);
+            searchInput.value = "";
+            dropdown.classList.add("hidden");
+          });
+          dropdown.appendChild(item);
+          shown++;
+        });
+      });
+      dropdown.classList.remove("hidden");
+    }
+    searchInput.addEventListener("focus", function () {
+      renderDropdown(searchInput.value);
+    });
+    searchInput.addEventListener("input", function () {
+      renderDropdown(searchInput.value);
+    });
+    searchInput.addEventListener("blur", function () {
+      // Delay to allow click on dropdown item
+      setTimeout(function () { dropdown.classList.add("hidden"); }, 200);
+    });
+    // Keyboard navigation
+    searchInput.addEventListener("keydown", function (e) {
+      var items = dropdown.querySelectorAll(".food-dropdown-item");
+      var active = dropdown.querySelector(".food-dropdown-item.active");
+      var idx = -1;
+      if (active) {
+        for (var i = 0; i < items.length; i++) {
+          if (items[i] === active) { idx = i; break; }
+        }
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (active) active.classList.remove("active");
+        idx = (idx + 1) % items.length;
+        items[idx].classList.add("active");
+        items[idx].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (active) active.classList.remove("active");
+        idx = idx <= 0 ? items.length - 1 : idx - 1;
+        items[idx].classList.add("active");
+        items[idx].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (active) {
+          var foodName = active.getAttribute("data-food-name");
+          addFoodItem(slotId, foodName, 1);
+          searchInput.value = "";
+          dropdown.classList.add("hidden");
+        }
+      }
+    });
   });
-});
+})();
+// Add a food item to a meal slot
+function addFoodItem(slotId, foodName, qty) {
+  var co2 = FOOD_CO2[foodName];
+  if (co2 === undefined) return;
+  // Check if already in slot, if so increment qty
+  var items = mealSlotItems[slotId];
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].name === foodName) {
+      items[i].qty += qty;
+      renderFoodSlot(slotId);
+      updateMealTotal();
+      return;
+    }
+  }
+  items.push({ name: foodName, qty: qty, co2: co2 });
+  renderFoodSlot(slotId);
+  updateMealTotal();
+}
+// Remove a food item from a meal slot
+function removeFoodItem(slotId, foodName) {
+  mealSlotItems[slotId] = mealSlotItems[slotId].filter(function (it) {
+    return it.name !== foodName;
+  });
+  renderFoodSlot(slotId);
+  updateMealTotal();
+}
+// Render the items list for a slot
+function renderFoodSlot(slotId) {
+  var listEl = document.querySelector('.food-items-list[data-slot="' + slotId + '"]');
+  if (!listEl) return;
+  listEl.innerHTML = "";
+  var slotTotal = 0;
+  mealSlotItems[slotId].forEach(function (item) {
+    var itemCo2 = item.co2 * item.qty;
+    slotTotal += itemCo2;
+    var row = document.createElement("div");
+    row.className = "food-item-row";
+    // Find unit label
+    var unitLabel = "";
+    for (var i = 0; i < FOOD_DB.length; i++) {
+      if (FOOD_DB[i][0] === item.name) { unitLabel = FOOD_DB[i][2]; break; }
+    }
+    row.innerHTML =
+      '<span class="food-item-row-name">' + item.name + '</span>' +
+      '<div class="food-item-row-controls">' +
+        '<button type="button" class="food-qty-btn" data-action="dec">&minus;</button>' +
+        '<input type="number" class="food-qty-input" value="' + item.qty + '" min="1" max="20" step="1">' +
+        '<button type="button" class="food-qty-btn" data-action="inc">+</button>' +
+        '<span class="food-item-row-unit">' + unitLabel + '</span>' +
+      '</div>' +
+      '<span class="food-item-row-co2">' + itemCo2.toFixed(2) + ' kg</span>' +
+      '<button type="button" class="food-item-remove" title="Remove">&times;</button>';
+    // Qty buttons
+    row.querySelector('[data-action="dec"]').addEventListener("click", function () {
+      if (item.qty > 1) {
+        item.qty--;
+        renderFoodSlot(slotId);
+        updateMealTotal();
+      }
+    });
+    row.querySelector('[data-action="inc"]').addEventListener("click", function () {
+      if (item.qty < 20) {
+        item.qty++;
+        renderFoodSlot(slotId);
+        updateMealTotal();
+      }
+    });
+    // Qty input direct edit
+    var qtyInput = row.querySelector(".food-qty-input");
+    qtyInput.addEventListener("change", function () {
+      var v = parseInt(qtyInput.value, 10);
+      if (isNaN(v) || v < 1) v = 1;
+      if (v > 20) v = 20;
+      item.qty = v;
+      renderFoodSlot(slotId);
+      updateMealTotal();
+    });
+    // Remove button
+    row.querySelector(".food-item-remove").addEventListener("click", function () {
+      removeFoodItem(slotId, item.name);
+    });
+    listEl.appendChild(row);
+  });
+  // Update slot subtotal
+  var wrapper = listEl.closest(".food-slot-wrapper");
+  if (wrapper) {
+    var sub = wrapper.querySelector(".food-slot-subtotal strong");
+    if (sub) sub.textContent = slotTotal.toFixed(2);
+  }
+}
+// Calculate total daily food CO2
 var mealDailyTotal = document.getElementById("meal-daily-total");
 function updateMealTotal() {
   var total = 0;
-  mealSelects.forEach(function (sel) {
-    total += (MEAL_CO2[sel.value] || 0);
+  var slotIds = ["meal-breakfast", "meal-lunch", "meal-snack", "meal-dinner"];
+  slotIds.forEach(function (sid) {
+    mealSlotItems[sid].forEach(function (item) {
+      total += item.co2 * item.qty;
+    });
   });
-  mealDailyTotal.textContent = total.toFixed(1);
+  if (mealDailyTotal) mealDailyTotal.textContent = total.toFixed(1);
   return total;
 }
-mealSelects.forEach(function (sel) {
-  sel.addEventListener("change", updateMealTotal);
-});
 function calcMealEmission() {
   var dailyKg = updateMealTotal();
   return (dailyKg * 365) / 1000;
