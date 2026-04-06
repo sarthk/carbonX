@@ -64,7 +64,7 @@
       <span class="impact-desc">Average Indian's footprint</span>
     </div>
     <div class="impact-item">
-      <span class="impact-number">263</span>
+      <span class="impact-number">471</span>
       <span class="impact-label">vehicles</span>
       <span class="impact-desc">In our database</span>
     </div>
@@ -72,6 +72,11 @@
       <span class="impact-number">24</span>
       <span class="impact-label">states</span>
       <span class="impact-desc">Covered</span>
+    </div>
+    <div class="impact-item">
+      <span class="impact-number">48</span>
+      <span class="impact-label">airports</span>
+      <span class="impact-desc">Flight routes</span>
     </div>
   </section>
 
@@ -179,6 +184,50 @@
         </div>
       </div>
 
+      <!-- VEHICLE USAGE FREQUENCY -->
+      <div class="form-group hidden" id="usage-freq-group">
+        <label>How often do you use this vehicle?</label>
+        <div class="usage-freq-options">
+          <label class="toggle-label"><input type="radio" name="usage-freq" value="daily" checked> Daily commute (5 days/week)</label>
+          <label class="toggle-label"><input type="radio" name="usage-freq" value="frequent"> Frequent (3–4 days/week)</label>
+          <label class="toggle-label"><input type="radio" name="usage-freq" value="occasional"> Occasional (1–2 days/week)</label>
+          <label class="toggle-label"><input type="radio" name="usage-freq" value="rare"> Rare (a few times a month)</label>
+        </div>
+      </div>
+
+      <!-- PUBLIC TRANSPORT -->
+      <div class="section-label">&#128652; Public Transport</div>
+      <div class="form-group">
+        <label>Do you also use public transport?</label>
+        <div class="toggle-row">
+          <button type="button" class="toggle-btn" id="pt-no-btn">No</button>
+          <button type="button" class="toggle-btn" id="pt-yes-btn">Yes</button>
+        </div>
+      </div>
+      <div id="pt-fields" class="hidden">
+        <div class="form-group">
+          <label class="toggle-label"><input type="checkbox" id="pt-metro-check"> Metro</label>
+          <div class="hidden" id="pt-metro-km-group">
+            <input type="number" id="pt-metro-km" min="0" max="200" placeholder="Daily km by metro">
+            <small class="input-helper">0.031 kg CO2 per km</small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="toggle-label"><input type="checkbox" id="pt-bus-check"> Bus</label>
+          <div class="hidden" id="pt-bus-km-group">
+            <input type="number" id="pt-bus-km" min="0" max="200" placeholder="Daily km by bus">
+            <small class="input-helper">0.089 kg CO2 per km</small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="toggle-label"><input type="checkbox" id="pt-auto-check"> Auto-rickshaw</label>
+          <div class="hidden" id="pt-auto-km-group">
+            <input type="number" id="pt-auto-km" min="0" max="200" placeholder="Daily km by auto">
+            <small class="input-helper">0.12 kg CO2 per km</small>
+          </div>
+        </div>
+      </div>
+
       <!-- MEALS -->
       <div class="section-label">&#127869; Daily Meals</div>
 
@@ -240,6 +289,39 @@
 
       <div class="elec-result hidden" id="elec-result">
         Your electricity emits <strong id="elec-tonnes">0</strong> tonnes CO2/year
+      </div>
+
+      <!-- SOLAR PANELS -->
+      <div class="section-label" id="solar-section-label">&#9728;&#65039; Solar Panels</div>
+
+      <div class="form-group">
+        <label>Do you have solar panels at home?</label>
+        <div class="toggle-row">
+          <button type="button" class="toggle-btn" id="solar-html-no">No</button>
+          <button type="button" class="toggle-btn" id="solar-html-yes">Yes</button>
+        </div>
+      </div>
+      <div id="solar-html-fields" class="hidden">
+        <div class="form-group">
+          <label for="solar-html-size">System Size (kW)</label>
+          <input type="number" id="solar-html-size" min="0" max="50" step="0.5" placeholder="e.g. 3">
+          <small class="input-helper">Most Delhi homes install 3–5kW</small>
+        </div>
+        <div class="form-group">
+          <label for="solar-html-gen">Monthly Units Generated (kWh)</label>
+          <input type="number" id="solar-html-gen" min="0" max="5000" placeholder="e.g. 350">
+          <small class="input-helper">Check your solar inverter app</small>
+        </div>
+        <div class="form-group">
+          <label for="solar-html-export">Units Exported to Grid (kWh/month)</label>
+          <input type="number" id="solar-html-export" min="0" max="5000" placeholder="e.g. 100">
+          <small class="input-helper">Check net meter reading</small>
+        </div>
+        <div id="solar-html-result" class="hidden" style="background:#f0fdf4;padding:0.75rem 1rem;border-radius:12px;font-size:0.95rem;margin-bottom:0.5rem;border:2px solid #bbf7d0">
+          <strong style="color:#15803d">&#9728;&#65039; Solar Savings</strong><br>
+          Your solar panels avoid <strong id="solar-html-savings-kg" style="color:#15803d">0</strong> kg CO2/month
+          — equivalent to planting <strong id="solar-html-trees" style="color:#15803d">0</strong> trees
+        </div>
       </div>
 
       <!-- FLIGHTS -->
@@ -354,6 +436,37 @@
       </div>
     </div>
 
+    <!-- PERCENTILE RANKING -->
+    <div class="comparison" id="percentile-section" style="text-align:left">
+      <h3>Your Ranking</h3>
+      <div id="percentile-india" style="margin-bottom:1.25rem">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.4rem">
+          <span style="font-size:0.9rem;font-weight:600;color:#374151">vs India Average (1.9t)</span>
+          <span id="percentile-india-text" style="font-size:0.9rem;font-weight:700;color:#16a34a"></span>
+        </div>
+        <div class="bar-track" style="position:relative;height:22px">
+          <div class="bar" id="percentile-india-bar" style="background:#22c55e;width:0%;height:100%;border-radius:99px;transition:width 0.8s ease"></div>
+          <div id="percentile-india-marker" style="position:absolute;top:-4px;width:3px;height:30px;background:#1f2937;border-radius:2px;transition:left 0.8s ease;left:19%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#6b7280;margin-top:0.2rem">
+          <span>0t</span><span>India avg: 1.9t</span><span>10t</span>
+        </div>
+      </div>
+      <div id="percentile-global">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.4rem">
+          <span style="font-size:0.9rem;font-weight:600;color:#374151">vs Global Average (4.7t)</span>
+          <span id="percentile-global-text" style="font-size:0.9rem;font-weight:700;color:#16a34a"></span>
+        </div>
+        <div class="bar-track" style="position:relative;height:22px">
+          <div class="bar" id="percentile-global-bar" style="background:#3b82f6;width:0%;height:100%;border-radius:99px;transition:width 0.8s ease"></div>
+          <div id="percentile-global-marker" style="position:absolute;top:-4px;width:3px;height:30px;background:#1f2937;border-radius:2px;transition:left 0.8s ease;left:47%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#6b7280;margin-top:0.2rem">
+          <span>0t</span><span>Global avg: 4.7t</span><span>10t</span>
+        </div>
+      </div>
+    </div>
+
     <div class="city-alternatives hidden" id="city-alternatives">
       <h3>Greener Options in Your City</h3>
       <ul id="alternatives-list"></ul>
@@ -385,7 +498,9 @@
           <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#5DCAA5">1.9t</div><div style="font-size:10px;opacity:0.5">India avg</div></div>
           <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#9FE1CB">4.0t</div><div style="font-size:10px;opacity:0.5">World avg</div></div>
         </div>
-        <div style="text-align:center;font-size:11px;opacity:0.5">Calculate yours at sarthk.github.io/carbonX</div>
+        <div id="share-biggest-source" style="text-align:center;font-size:12px;margin-bottom:0.5rem;color:#9FE1CB"></div>
+        <div id="share-action-tip" style="text-align:center;font-size:11px;margin-bottom:0.75rem;opacity:0.7;padding:0 0.5rem"></div>
+        <div style="text-align:center;font-size:11px;opacity:0.5">Calculated on carbonx.in</div>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:1rem">
         <button onclick="shareWA()" style="flex:1;padding:10px;background:#25D366;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer">WhatsApp</button>
@@ -415,11 +530,11 @@
     function shareWA(){
       var t=document.getElementById('share-total').textContent;
       var b=document.getElementById('share-badge').textContent;
-      var msg='My carbon footprint is '+t+' tonnes CO2/year. I am a "'+b+'" on CarbonX! Calculate yours: sarthk.github.io/carbonX';
+      var msg='My carbon footprint is '+t+' tonnes CO2/year. I am a "'+b+'" on CarbonX! Calculate yours: carbonx.in';
       window.open('https://wa.me/?text='+encodeURIComponent(msg));
     }
     function copyLink(){
-      navigator.clipboard.writeText('sarthk.github.io/carbonX').then(function(){
+      navigator.clipboard.writeText('carbonx.in').then(function(){
         var btn=document.getElementById('copy-btn');
         btn.textContent='Copied!';
         setTimeout(function(){btn.textContent='Copy Link';},2000);
