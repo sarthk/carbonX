@@ -1549,35 +1549,215 @@ function calcElecEmission() {
   return (units * getStateEF() * 12) / 1000;
 }
 // ============================================================
+// Solar Panel Calculation Logic
+// ============================================================
+// Solar state — will be wired to HTML inputs in next session
+var solarEnabled = false;
+var solarSystemSize = 0;     // kW
+var solarMonthlyGen = 0;     // kWh generated per month
+var solarMonthlyExport = 0;  // kWh exported to grid per month
+
+// Inject solar UI into the calculator (between Electricity and Flights)
+(function initSolarUI() {
+  var elecResult = document.getElementById("elec-result");
+  if (!elecResult) return;
+  var insertPoint = elecResult.parentElement || elecResult;
+  // Find the flights section label to insert before it
+  var allLabels = document.querySelectorAll(".section-label");
+  var flightsLabel = null;
+  for (var i = 0; i < allLabels.length; i++) {
+    if (allLabels[i].textContent.indexOf("Flights") !== -1) {
+      flightsLabel = allLabels[i];
+      break;
+    }
+  }
+  if (!flightsLabel) return;
+
+  var solarSection = document.createElement("div");
+  solarSection.id = "solar-section";
+  solarSection.innerHTML =
+    '<div class="section-label">\u2600\uFE0F Solar Panels</div>' +
+    '<div class="form-group">' +
+      '<label>Do you have solar panels at home?</label>' +
+      '<div class="toggle-row">' +
+        '<button type="button" class="toggle-btn" id="solar-no-btn">No</button>' +
+        '<button type="button" class="toggle-btn" id="solar-yes-btn">Yes</button>' +
+      '</div>' +
+    '</div>' +
+    '<div id="solar-fields" class="hidden">' +
+      '<div class="form-group">' +
+        '<label for="solar-size">System Size (kW)</label>' +
+        '<input type="number" id="solar-size" min="0" max="50" step="0.5" placeholder="e.g. 3">' +
+        '<small class="input-helper">Most Delhi homes install 3\u20135kW</small>' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label for="solar-gen">Monthly Units Generated (kWh)</label>' +
+        '<input type="number" id="solar-gen" min="0" max="5000" placeholder="e.g. 350">' +
+        '<small class="input-helper">Check your solar inverter app or net meter</small>' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label for="solar-export">Units Exported to Grid (kWh/month)</label>' +
+        '<input type="number" id="solar-export" min="0" max="5000" placeholder="e.g. 100">' +
+        '<small class="input-helper">Units sent back to DISCOM \u2014 check net meter reading</small>' +
+      '</div>' +
+      '<div id="solar-result" class="hidden" style="background:#f0fdf4;padding:0.75rem 1rem;border-radius:12px;font-size:0.95rem;margin-bottom:0.5rem;border:2px solid #bbf7d0">' +
+        '<strong style="color:#15803d">\u2600\uFE0F Solar Savings</strong><br>' +
+        'Your solar panels avoid <strong id="solar-savings-kg" style="color:#15803d">0</strong> kg CO2/month' +
+        ' \u2014 equivalent to planting <strong id="solar-trees" style="color:#15803d">0</strong> trees' +
+      '</div>' +
+    '</div>';
+
+  flightsLabel.parentNode.insertBefore(solarSection, flightsLabel);
+
+  var solarYesBtn = document.getElementById("solar-yes-btn");
+  var solarNoBtn = document.getElementById("solar-no-btn");
+  var solarFields = document.getElementById("solar-fields");
+  var solarSizeInput = document.getElementById("solar-size");
+  var solarGenInput = document.getElementById("solar-gen");
+  var solarExportInput = document.getElementById("solar-export");
+  var solarResultEl = document.getElementById("solar-result");
+  var solarSavingsKg = document.getElementById("solar-savings-kg");
+  var solarTreesEl = document.getElementById("solar-trees");
+
+  // Default: No selected
+  solarNoBtn.classList.add("active");
+
+  solarYesBtn.addEventListener("click", function () {
+    solarEnabled = true;
+    solarYesBtn.classList.add("active");
+    solarNoBtn.classList.remove("active");
+    solarFields.classList.remove("hidden");
+  });
+  solarNoBtn.addEventListener("click", function () {
+    solarEnabled = false;
+    solarNoBtn.classList.add("active");
+    solarYesBtn.classList.remove("active");
+    solarFields.classList.add("hidden");
+    solarResultEl.classList.add("hidden");
+    solarSystemSize = 0;
+    solarMonthlyGen = 0;
+    solarMonthlyExport = 0;
+  });
+
+  function updateSolarResult() {
+    solarSystemSize = parseFloat(solarSizeInput.value) || 0;
+    solarMonthlyGen = parseFloat(solarGenInput.value) || 0;
+    solarMonthlyExport = parseFloat(solarExportInput.value) || 0;
+    if (solarMonthlyGen > 0) {
+      var ef = getStateEF();
+      var monthlySavings = (solarMonthlyGen + solarMonthlyExport) * ef;
+      var trees = Math.round(monthlySavings / 1.83);
+      solarSavingsKg.textContent = monthlySavings.toFixed(1);
+      solarTreesEl.textContent = trees;
+      solarResultEl.classList.remove("hidden");
+    } else {
+      solarResultEl.classList.add("hidden");
+    }
+  }
+
+  solarSizeInput.addEventListener("input", updateSolarResult);
+  solarGenInput.addEventListener("input", updateSolarResult);
+  solarExportInput.addEventListener("input", updateSolarResult);
+})();
+
+// Calculate solar offset in tonnes/year (returns negative value = offset)
+function calcSolarOffset() {
+  if (!solarEnabled) return 0;
+  var ef = getStateEF();
+  // Solar generated offsets grid consumption
+  // Exported units are additional negative emissions
+  var monthlyOffsetKg = (solarMonthlyGen + solarMonthlyExport) * ef;
+  return -(monthlyOffsetKg * 12) / 1000; // negative tonnes/year
+}
+// ============================================================
 // Part 3: Flights, Results, Donut Chart, Badges, WhatsApp
 // ============================================================
 var AIRPORTS = [
+  // Tier 1
   ["DEL", "Delhi (DEL)"], ["BOM", "Mumbai (BOM)"], ["BLR", "Bengaluru (BLR)"],
   ["MAA", "Chennai (MAA)"], ["CCU", "Kolkata (CCU)"], ["HYD", "Hyderabad (HYD)"],
-  ["COK", "Kochi (COK)"], ["AMD", "Ahmedabad (AMD)"], ["GOI", "Goa (GOI)"],
-  ["JAI", "Jaipur (JAI)"], ["LKO", "Lucknow (LKO)"], ["PNQ", "Pune (PNQ)"],
+  ["PNQ", "Pune (PNQ)"], ["AMD", "Ahmedabad (AMD)"], ["COK", "Kochi (COK)"],
+  // Tier 2
+  ["JAI", "Jaipur (JAI)"], ["LKO", "Lucknow (LKO)"], ["IXC", "Chandigarh (IXC)"],
+  ["BHO", "Bhopal (BHO)"], ["NAG", "Nagpur (NAG)"], ["IDR", "Indore (IDR)"],
+  ["STV", "Surat (STV)"], ["BDQ", "Vadodara (BDQ)"], ["CJB", "Coimbatore (CJB)"],
+  ["TRV", "Thiruvananthapuram (TRV)"], ["VTZ", "Visakhapatnam (VTZ)"],
+  ["BBI", "Bhubaneswar (BBI)"], ["PAT", "Patna (PAT)"], ["IXR", "Ranchi (IXR)"],
+  ["GAU", "Guwahati (GAU)"], ["IXA", "Agartala (IXA)"],
+  // Tier 3 (tourist/religious)
+  ["GOI", "Goa (GOI)"], ["VNS", "Varanasi (VNS)"], ["ATQ", "Amritsar (ATQ)"],
+  ["IXJ", "Jammu (IXJ)"], ["SXR", "Srinagar (SXR)"], ["IXL", "Leh (IXL)"],
+  ["DED", "Dehradun (DED)"], ["IXB", "Bagdogra (IXB)"], ["IMF", "Imphal (IMF)"],
+  ["DIB", "Dibrugarh (DIB)"], ["IXZ", "Port Blair (IXZ)"], ["AGR", "Agra (AGR)"],
+  ["UDR", "Udaipur (UDR)"], ["JDH", "Jodhpur (JDH)"], ["IXU", "Aurangabad (IXU)"],
+  // International
   ["DXB", "Dubai (DXB)"], ["LHR", "London (LHR)"], ["SIN", "Singapore (SIN)"],
   ["BKK", "Bangkok (BKK)"], ["JFK", "New York (JFK)"], ["CDG", "Paris (CDG)"],
   ["SYD", "Sydney (SYD)"], ["NRT", "Tokyo (NRT)"]
 ];
+// Comprehensive route distances (km) — all keys sorted alphabetically
 var ROUTE_KM = {
-  "AMD-BOM": 524, "AMD-DEL": 776,
-  "BLR-BOM": 984, "BLR-CCU": 1871, "BLR-DEL": 1740, "BLR-HYD": 570,
-  "BLR-MAA": 334, "BLR-SIN": 3918,
-  "BKK-BOM": 3694, "BKK-DEL": 4551,
-  "BOM-CCU": 1657, "BOM-DEL": 1148, "BOM-DXB": 1926, "BOM-GOI": 554,
-  "BOM-HYD": 709, "BOM-LHR": 7198, "BOM-MAA": 1032, "BOM-SIN": 5036,
-  "CCU-DEL": 1305, "CCU-MAA": 1359,
-  "CDG-DEL": 6589, "COK-BOM": 1068, "COK-DEL": 2048,
-  "DEL-DXB": 2190, "DEL-GOI": 1899, "DEL-HYD": 1253, "DEL-JAI": 268,
+  // DEL hub
+  "AMD-DEL": 776, "AGR-DEL": 200, "ATQ-DEL": 450, "BBI-DEL": 1600,
+  "BHO-DEL": 680, "BLR-DEL": 1740, "BOM-DEL": 1148, "CCU-DEL": 1305,
+  "CJB-DEL": 1960, "COK-DEL": 2048, "DED-DEL": 235, "DEL-DIB": 1900,
+  "DEL-DXB": 2190, "DEL-GAU": 1800, "DEL-GOI": 1899, "DEL-HYD": 1253,
+  "DEL-IDR": 780, "DEL-IMF": 2350, "DEL-IXA": 2100, "DEL-IXB": 1520,
+  "DEL-IXC": 260, "DEL-IXJ": 590, "DEL-IXL": 600, "DEL-IXR": 1300,
+  "DEL-IXU": 1200, "DEL-IXZ": 3100, "DEL-JAI": 268, "DEL-JDH": 570,
   "DEL-JFK": 11756, "DEL-LHR": 6715, "DEL-LKO": 510, "DEL-MAA": 1758,
-  "DEL-NRT": 5839, "DEL-PNQ": 1177, "DEL-SIN": 5985, "DEL-SYD": 10147,
-  "HYD-MAA": 625
+  "DEL-NAG": 860, "DEL-NRT": 5839, "DEL-PAT": 930, "DEL-PNQ": 1177,
+  "DEL-SIN": 5985, "DEL-STV": 950, "DEL-SXR": 670, "DEL-SYD": 10147,
+  "DEL-TRV": 2230, "DEL-UDR": 640, "DEL-VNS": 760, "DEL-VTZ": 1620,
+  "BDQ-DEL": 890,
+  // BOM hub
+  "AMD-BOM": 524, "BBI-BOM": 1400, "BHO-BOM": 590, "BLR-BOM": 984,
+  "BOM-CCU": 1657, "BOM-CJB": 960, "BOM-COK": 1068, "BOM-DXB": 1926,
+  "BOM-GAU": 2200, "BOM-GOI": 554, "BOM-HYD": 709, "BOM-IDR": 510,
+  "BOM-IXU": 260, "BOM-JAI": 1020, "BOM-JDH": 850, "BOM-LHR": 7198,
+  "BOM-LKO": 1150, "BOM-MAA": 1032, "BOM-NAG": 700, "BOM-PAT": 1520,
+  "BOM-PNQ": 150, "BOM-SIN": 5036, "BOM-STV": 280, "BOM-TRV": 1220,
+  "BOM-UDR": 680, "BOM-VNS": 1180, "BOM-VTZ": 1080, "BDQ-BOM": 400,
+  // BLR hub
+  "BBI-BLR": 1560, "BLR-CCU": 1871, "BLR-CJB": 360, "BLR-COK": 540,
+  "BLR-GOI": 560, "BLR-HYD": 570, "BLR-MAA": 334, "BLR-NAG": 900,
+  "BLR-PNQ": 840, "BLR-SIN": 3918, "BLR-TRV": 600, "BLR-VTZ": 800,
+  "BLR-IXZ": 2200,
+  // MAA hub
+  "CCU-MAA": 1359, "CJB-MAA": 500, "COK-MAA": 600, "HYD-MAA": 625,
+  "MAA-PNQ": 1060, "MAA-TRV": 700, "MAA-VTZ": 620, "MAA-BBI": 1100,
+  "MAA-IXZ": 1370, "MAA-SIN": 3150,
+  // CCU hub
+  "BBI-CCU": 440, "CCU-GAU": 880, "CCU-HYD": 1480, "CCU-IXA": 1200,
+  "CCU-IXB": 550, "CCU-IXR": 350, "CCU-PAT": 490, "CCU-VNS": 680,
+  "CCU-IMF": 1580, "CCU-DIB": 1100, "CCU-IXZ": 1500,
+  // HYD hub
+  "HYD-NAG": 500, "HYD-PNQ": 560, "HYD-VTZ": 620, "HYD-GOI": 560,
+  "HYD-BBI": 930, "HYD-CJB": 740, "HYD-COK": 900,
+  // NE India
+  "DIB-GAU": 420, "GAU-IMF": 530, "GAU-IXA": 480, "GAU-IXB": 580,
+  // Rajasthan
+  "JAI-JDH": 340, "JAI-UDR": 390, "JDH-UDR": 260,
+  // Tier 2 interconnects
+  "BHO-IDR": 190, "BHO-NAG": 290, "IDR-BOM": 510, "STV-BDQ": 150,
+  "PAT-VNS": 270, "PAT-IXR": 300, "LKO-VNS": 290, "LKO-PAT": 540,
+  "ATQ-IXC": 230, "ATQ-IXJ": 200, "IXC-DED": 170, "IXJ-SXR": 260,
+  "SXR-IXL": 420, "DED-IXB": 1300,
+  // Goa interconnects
+  "COK-GOI": 600, "GOI-PNQ": 450,
+  // International from BLR/MAA/CCU
+  "BKK-BOM": 3694, "BKK-DEL": 4551, "BKK-BLR": 3150, "BKK-CCU": 2400,
+  "BKK-MAA": 2700, "CDG-DEL": 6589, "CDG-BOM": 7000
 };
+// Pre-computed ROUTE_CO2 for popular routes (kg CO2, economy)
 var ROUTE_CO2 = {
   "BOM-DEL": 293, "BLR-DEL": 443, "DEL-MAA": 448, "CCU-DEL": 333,
   "DEL-HYD": 319, "DEL-GOI": 484, "DEL-DXB": 557, "DEL-LHR": 1712,
-  "DEL-SIN": 1526, "DEL-JFK": 2998, "BOM-LHR": 1835
+  "DEL-SIN": 1526, "DEL-JFK": 2998, "BOM-LHR": 1835, "BOM-BLR": 251,
+  "BLR-MAA": 85, "BOM-GOI": 141, "BOM-HYD": 181, "BLR-HYD": 145,
+  "DEL-JAI": 68, "CCU-BBI": 112, "DEL-LKO": 130, "BOM-PNQ": 38,
+  "BOM-COK": 272, "DEL-IXC": 66, "DEL-ATQ": 115, "DEL-SXR": 171,
+  "DEL-VNS": 194, "CCU-GAU": 224
 };
 var KG_CO2_PER_KM = 0.255;
 function getRouteKey(a, b) { return a < b ? a + "-" + b : b + "-" + a; }
@@ -1756,7 +1936,7 @@ function getTopSuggestions(categories) {
   return tips.slice(0, 3);
 }
 // ---------- DONUT CHART ----------
-var DONUT_COLORS = ["#16a34a", "#f59e0b", "#3b82f6", "#8b5cf6"];
+var DONUT_COLORS = ["#16a34a", "#f59e0b", "#3b82f6", "#8b5cf6", "#22c55e"];
 function drawDonut(canvas, segments) {
   var ctx = canvas.getContext("2d");
   var cx = canvas.width / 2, cy = canvas.height / 2;
@@ -1813,7 +1993,8 @@ form.addEventListener("submit", function (e) {
   var food = calcMealEmission();
   var electricity = calcElecEmission();
   var flights = calcFlightEmission();
-  var total = transport + food + electricity + flights;
+  var solarOffset = calcSolarOffset(); // negative value
+  var total = Math.max(0, transport + food + electricity + flights + solarOffset);
 
   // Badge
   var badge = getBadge(total);
@@ -1830,7 +2011,7 @@ form.addEventListener("submit", function (e) {
   barYou.style.background = total <= INDIA_AVG ? "var(--green-400)"
     : total <= GLOBAL_AVG ? "var(--green-500)" : "#f59e0b";
 
-  // Donut chart
+  // Donut chart — positive segments only (solar shown separately)
   var segments = [
     { label: "\uD83D\uDE97 Transport", val: transport },
     { label: "\uD83C\uDF7D\uFE0F Food", val: food },
@@ -1839,10 +2020,11 @@ form.addEventListener("submit", function (e) {
   ];
   drawDonut(donutCanvas, segments);
 
-  // Legend
+  // Legend — includes solar as a negative/green entry
   breakdownLegend.innerHTML = "";
+  var grossTotal = transport + food + electricity + flights;
   segments.forEach(function (s, i) {
-    var pct = total > 0 ? Math.round((s.val / total) * 100) : 0;
+    var pct = grossTotal > 0 ? Math.round((s.val / grossTotal) * 100) : 0;
     var li = document.createElement("li");
     li.innerHTML =
       '<span class="legend-dot" style="background:' + DONUT_COLORS[i] + '"></span>' +
@@ -1851,6 +2033,16 @@ form.addEventListener("submit", function (e) {
       '<span class="legend-pct">' + pct + '%</span>';
     breakdownLegend.appendChild(li);
   });
+  // Solar offset row (only if solar is active)
+  if (solarOffset < 0) {
+    var solarLi = document.createElement("li");
+    solarLi.innerHTML =
+      '<span class="legend-dot" style="background:' + DONUT_COLORS[4] + '"></span>' +
+      '<span>\u2600\uFE0F Solar Saved</span>' +
+      '<span class="legend-val" style="color:#16a34a">' + solarOffset.toFixed(2) + 't</span>' +
+      '<span class="legend-pct" style="color:#16a34a">offset</span>';
+    breakdownLegend.appendChild(solarLi);
+  }
 
   // City alternatives
   var alternatives = getCityAlternatives();
@@ -1893,7 +2085,7 @@ form.addEventListener("submit", function (e) {
 
   // Update share card
   if (typeof updateShareCard === 'function') {
-    updateShareCard(total, transport, food, electricity, flights, badge.title);
+    updateShareCard(total, transport, food, electricity, flights, badge.title, solarOffset);
   }
 
   // Show results
