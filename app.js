@@ -1075,23 +1075,97 @@ function getEffectiveMileage() {
 // ============================================================
 // Helper: calculate commute CO2 in tonnes/year
 // ============================================================
+// Vehicle usage frequency multiplier
+var FREQ_MULTIPLIER = { daily: 1.0, frequent: 0.7, occasional: 0.35, rare: 0.1 };
+function getFreqMultiplier() {
+  var checked = document.querySelector('input[name="usage-freq"]:checked');
+  return checked ? (FREQ_MULTIPLIER[checked.value] || 1.0) : 1.0;
+}
 function calcCommuteEmission() {
   if (!selectedVariant) return 0;
   var fuel = selectedVariant[2];
   var dailyKm = parseInt(kmSlider.value, 10) || 0;
+  var freqMult = getFreqMultiplier();
   if (fuel === "walk") return 0;
-  if (fuel === "public") return (dailyKm * EF.public * 365) / 1000;
-  if (fuel === "auto") return (dailyKm * EF.auto * 365) / 1000;
-  if (fuel === "erickshaw") return (dailyKm * EF.erickshaw * 365) / 1000;
+  if (fuel === "public") return (dailyKm * EF.public * 365 * freqMult) / 1000;
+  if (fuel === "auto") return (dailyKm * EF.auto * 365 * freqMult) / 1000;
+  if (fuel === "erickshaw") return (dailyKm * EF.erickshaw * 365 * freqMult) / 1000;
   if (fuel === "electric") {
     var kmPerKwh = getEffectiveMileage();
     if (!kmPerKwh || kmPerKwh === 0) return 0;
-    return (dailyKm / kmPerKwh) * EF.electric * 365 / 1000;
+    return (dailyKm / kmPerKwh) * EF.electric * 365 * freqMult / 1000;
   }
   var mileage = getEffectiveMileage();
   if (!mileage || mileage === 0) return 0;
   var factor = fuel === "cng" ? EF.cng : fuel === "diesel" ? EF.diesel : EF.petrol;
-  return ((dailyKm / mileage) * factor * 365) / 1000;
+  return ((dailyKm / mileage) * factor * 365 * freqMult) / 1000;
+}
+// Show usage frequency when a non-walk/PT vehicle is selected
+variantSelect.addEventListener("change", function () {
+  var freqGroup = document.getElementById("usage-freq-group");
+  if (freqGroup && selectedVariant) {
+    var fuel = selectedVariant[2];
+    if (fuel !== "walk" && fuel !== "public" && fuel !== "auto" && fuel !== "erickshaw") {
+      freqGroup.classList.remove("hidden");
+    } else {
+      freqGroup.classList.add("hidden");
+    }
+  }
+});
+// ============================================================
+// Public Transport — toggle, checkboxes, CO2 calculation
+// ============================================================
+(function initPublicTransport() {
+  var ptNoBtn = document.getElementById("pt-no-btn");
+  var ptYesBtn = document.getElementById("pt-yes-btn");
+  var ptFields = document.getElementById("pt-fields");
+  if (!ptNoBtn || !ptYesBtn || !ptFields) return;
+
+  ptNoBtn.classList.add("active");
+  ptNoBtn.addEventListener("click", function () {
+    ptNoBtn.classList.add("active");
+    ptYesBtn.classList.remove("active");
+    ptFields.classList.add("hidden");
+  });
+  ptYesBtn.addEventListener("click", function () {
+    ptYesBtn.classList.add("active");
+    ptNoBtn.classList.remove("active");
+    ptFields.classList.remove("hidden");
+  });
+
+  // Wire checkboxes to show/hide km inputs
+  var ptTypes = ["metro", "bus", "auto"];
+  ptTypes.forEach(function (type) {
+    var checkbox = document.getElementById("pt-" + type + "-check");
+    var kmGroup = document.getElementById("pt-" + type + "-km-group");
+    if (!checkbox || !kmGroup) return;
+    checkbox.addEventListener("change", function () {
+      if (checkbox.checked) {
+        kmGroup.classList.remove("hidden");
+      } else {
+        kmGroup.classList.add("hidden");
+      }
+    });
+  });
+})();
+
+// Public transport emission factors (kg CO2 per km)
+var PT_EF = { metro: 0.031, bus: 0.089, auto: 0.12 };
+
+function calcPublicTransportEmission() {
+  var ptYesBtn = document.getElementById("pt-yes-btn");
+  if (!ptYesBtn || !ptYesBtn.classList.contains("active")) return 0;
+  var total = 0;
+  var ptTypes = ["metro", "bus", "auto"];
+  ptTypes.forEach(function (type) {
+    var checkbox = document.getElementById("pt-" + type + "-check");
+    var kmInput = document.getElementById("pt-" + type + "-km");
+    if (checkbox && checkbox.checked && kmInput) {
+      var km = parseFloat(kmInput.value) || 0;
+      total += km * PT_EF[type] * 365;
+    }
+  });
+  return total / 1000; // tonnes/year
 }
 // ============================================================
 // Part 2: Meals & Electricity
@@ -1660,6 +1734,58 @@ var solarMonthlyExport = 0;  // kWh exported to grid per month
   solarExportInput.addEventListener("input", updateSolarResult);
 })();
 
+// Wire up static HTML solar toggles (solar-html-* IDs from index.html)
+(function initStaticSolarHTML() {
+  var htmlNo = document.getElementById("solar-html-no");
+  var htmlYes = document.getElementById("solar-html-yes");
+  var htmlFields = document.getElementById("solar-html-fields");
+  var htmlSize = document.getElementById("solar-html-size");
+  var htmlGen = document.getElementById("solar-html-gen");
+  var htmlExport = document.getElementById("solar-html-export");
+  var htmlResult = document.getElementById("solar-html-result");
+  var htmlSavingsKg = document.getElementById("solar-html-savings-kg");
+  var htmlTrees = document.getElementById("solar-html-trees");
+  if (!htmlNo || !htmlYes) return;
+
+  htmlNo.classList.add("active");
+  htmlYes.addEventListener("click", function () {
+    solarEnabled = true;
+    htmlYes.classList.add("active");
+    htmlNo.classList.remove("active");
+    if (htmlFields) htmlFields.classList.remove("hidden");
+  });
+  htmlNo.addEventListener("click", function () {
+    solarEnabled = false;
+    htmlNo.classList.add("active");
+    htmlYes.classList.remove("active");
+    if (htmlFields) htmlFields.classList.add("hidden");
+    if (htmlResult) htmlResult.classList.add("hidden");
+    solarSystemSize = 0;
+    solarMonthlyGen = 0;
+    solarMonthlyExport = 0;
+  });
+
+  function updateStaticSolar() {
+    if (!htmlSize || !htmlGen || !htmlExport) return;
+    solarSystemSize = parseFloat(htmlSize.value) || 0;
+    solarMonthlyGen = parseFloat(htmlGen.value) || 0;
+    solarMonthlyExport = parseFloat(htmlExport.value) || 0;
+    if (solarMonthlyGen > 0 && htmlResult && htmlSavingsKg && htmlTrees) {
+      var ef = getStateEF();
+      var monthlySavings = (solarMonthlyGen + solarMonthlyExport) * ef;
+      var trees = Math.round(monthlySavings / 1.83);
+      htmlSavingsKg.textContent = monthlySavings.toFixed(1);
+      htmlTrees.textContent = trees;
+      htmlResult.classList.remove("hidden");
+    } else if (htmlResult) {
+      htmlResult.classList.add("hidden");
+    }
+  }
+  if (htmlSize) htmlSize.addEventListener("input", updateStaticSolar);
+  if (htmlGen) htmlGen.addEventListener("input", updateStaticSolar);
+  if (htmlExport) htmlExport.addEventListener("input", updateStaticSolar);
+})();
+
 // Calculate solar offset in tonnes/year (returns negative value = offset)
 function calcSolarOffset() {
   if (!solarEnabled) return 0;
@@ -1900,40 +2026,57 @@ function getCityAlternatives() {
     return { name: alt.name, saving: userTonnes - altTonnes, costLabel: alt.costLabel };
   }).filter(function (a) { return a.saving > 0.01; });
 }
-// ---------- SUGGESTIONS ----------
-var SUGGESTIONS = {
-  transport: [
-    "Switch to public transport or carpooling \u2014 it can cut your commute emissions by up to 75%.",
-    "Consider an electric vehicle for your daily commute \u2014 EVs produce zero direct emissions.",
-    "Work from home 1\u20132 days a week to reduce your commute footprint significantly."
-  ],
-  food: [
-    "Try going meat-free 2\u20133 days a week \u2014 even small dietary shifts can save over 0.5 tonnes CO2 a year.",
-    "Switching to more plant-based meals and reducing dairy can lower your food footprint significantly.",
-    "Buy local and seasonal produce to cut emissions from food transport."
-  ],
-  electricity: [
-    "Explore switching to a renewable energy provider \u2014 it's one of the highest-impact changes you can make at home.",
-    "Switch to LED lighting and 5-star rated appliances to cut your electricity consumption by 20\u201330%.",
-    "Consider rooftop solar \u2014 it can eliminate most of your home electricity emissions."
-  ],
-  flights: [
-    "Reducing one long-haul flight a year saves roughly 1\u20132 tonnes CO2. Consider trains for shorter trips.",
-    "Fly economy class \u2014 business class has 2.5x the carbon footprint per seat.",
-    "Offset your flights through verified carbon offset programmes like Gold Standard."
-  ]
-};
-function getTopSuggestions(categories) {
+// ---------- CONDITIONAL SUGGESTIONS ----------
+function getConditionalTips(transport, food, electricity, flights) {
   var tips = [];
-  for (var i = 0; i < categories.length && tips.length < 3; i++) {
-    var pool = SUGGESTIONS[categories[i].name];
-    if (pool && categories[i].val > 0) tips.push(pool[0]);
+  var dailyKm = parseInt(kmSlider.value, 10) || 0;
+  var monthlyUnits = parseFloat(monthlyUnitsInput.value) || 0;
+  var fuel = selectedVariant ? selectedVariant[2] : null;
+
+  // Transport: petrol vehicle with >15 km daily
+  if (fuel === "petrol" && dailyKm > 15) {
+    var monthlyCommuteCO2 = Math.round((transport * 1000) / 12);
+    tips.push("Switch to Metro or EV \u2014 your daily commute adds " + monthlyCommuteCO2 + " kg CO2/month.");
+  } else if (transport > 0) {
+    tips.push("Consider carpooling or public transport to cut your commute emissions by up to 75%.");
   }
-  for (var j = 0; j < categories.length && tips.length < 3; j++) {
-    var pool2 = SUGGESTIONS[categories[j].name];
-    if (pool2 && pool2[1] && tips.indexOf(pool2[1]) === -1) tips.push(pool2[1]);
+
+  // Electricity: >500 kWh/month
+  if (monthlyUnits > 500) {
+    var acSavings = Math.round(monthlyUnits * 0.45 * getStateEF() * 0.15 * 12);
+    tips.push("Your AC likely accounts for 40\u201350% of this. Set it to 24\u00B0C to cut ~" + acSavings + " kg CO2/year.");
+  } else if (electricity > 0) {
+    tips.push("Switch to LED lighting and 5-star rated appliances to cut electricity use by 20\u201330%.");
   }
-  return tips.slice(0, 3);
+
+  // Flights: >2 return trips
+  var returnTrips = trips.filter(function (t) { return t.isReturn; }).length;
+  var totalFlightKg = Math.round(flights * 1000);
+  if (returnTrips > 2 || totalFlightKg > 1000) {
+    tips.push("Consider carbon offsetting \u2014 your flights emit " + totalFlightKg + " kg CO2.");
+  } else if (flights > 0) {
+    tips.push("Fly economy class \u2014 business class has 2.5x the carbon footprint per seat.");
+  }
+
+  // Food: check if meat items are present daily
+  var hasMeatDaily = false;
+  var meatItems = ["Chicken Curry", "Butter Chicken", "Chicken Biryani", "Grilled Chicken",
+    "Mutton Curry", "Mutton Biryani", "Fish Curry", "Prawns"];
+  var slotIds = ["meal-breakfast", "meal-lunch", "meal-snack", "meal-dinner"];
+  var meatCount = 0;
+  slotIds.forEach(function (sid) {
+    mealSlotItems[sid].forEach(function (item) {
+      if (meatItems.indexOf(item.name) !== -1) meatCount++;
+    });
+  });
+  if (meatCount >= 2) {
+    hasMeatDaily = true;
+    tips.push("Replacing one meat meal/day with dal saves ~0.3\u20130.6 kg CO2 daily (" + Math.round(meatCount * 0.4 * 365) + " kg/year).");
+  } else if (food > 0 && tips.length < 4) {
+    tips.push("Buy local and seasonal produce to cut emissions from food transport.");
+  }
+
+  return tips.slice(0, 4);
 }
 // ---------- DONUT CHART ----------
 var DONUT_COLORS = ["#16a34a", "#f59e0b", "#3b82f6", "#8b5cf6", "#22c55e"];
@@ -1963,6 +2106,66 @@ function drawDonut(canvas, segments) {
   ctx.textBaseline = "middle";
   ctx.fillText(total.toFixed(1) + "t", cx, cy);
 }
+// ---------- SCORECARD / SHARE CARD ----------
+function updateShareCard(total, transport, food, electricity, flights, badgeTitle, solarOffset) {
+  var shareTotal = document.getElementById("share-total");
+  var shareBadge = document.getElementById("share-badge");
+  var shareYou = document.getElementById("share-you");
+  var shareBars = document.getElementById("share-bars");
+  var shareBiggest = document.getElementById("share-biggest-source");
+  var shareActionTip = document.getElementById("share-action-tip");
+  if (!shareTotal) return;
+
+  shareTotal.textContent = total.toFixed(1);
+  if (shareBadge) shareBadge.textContent = badgeTitle;
+  if (shareYou) shareYou.textContent = total.toFixed(1) + "t";
+
+  // Build share bars
+  var cats = [
+    { label: "\uD83D\uDE97 Transport", val: transport, color: "#16a34a" },
+    { label: "\uD83C\uDF7D\uFE0F Food", val: food, color: "#f59e0b" },
+    { label: "\u26A1 Electricity", val: electricity, color: "#3b82f6" },
+    { label: "\u2708\uFE0F Flights", val: flights, color: "#8b5cf6" }
+  ];
+  if (solarOffset < 0) {
+    cats.push({ label: "\u2600\uFE0F Solar", val: solarOffset, color: "#22c55e" });
+  }
+  var grossTotal = transport + food + electricity + flights;
+  if (shareBars) {
+    shareBars.innerHTML = "";
+    cats.forEach(function (c) {
+      var pct = grossTotal > 0 ? Math.abs(c.val / grossTotal) * 100 : 0;
+      var row = document.createElement("div");
+      row.style.cssText = "display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;";
+      row.innerHTML =
+        '<span style="min-width:90px;opacity:0.7">' + c.label + '</span>' +
+        '<div style="flex:1;background:rgba(255,255,255,0.1);border-radius:4px;height:8px">' +
+          '<div style="height:100%;width:' + Math.min(pct, 100) + '%;background:' + c.color + ';border-radius:4px"></div>' +
+        '</div>' +
+        '<span style="min-width:40px;text-align:right;font-weight:600">' + (c.val < 0 ? c.val.toFixed(1) : c.val.toFixed(1)) + 't</span>';
+      shareBars.appendChild(row);
+    });
+  }
+
+  // Identify top emission source
+  var sorted = cats.filter(function (c) { return c.val > 0; }).sort(function (a, b) { return b.val - a.val; });
+  if (shareBiggest && sorted.length > 0) {
+    var top = sorted[0];
+    var topPct = grossTotal > 0 ? Math.round((top.val / grossTotal) * 100) : 0;
+    shareBiggest.textContent = "Biggest source: " + top.label + " (" + topPct + "% of total)";
+  }
+
+  // Map top source to action tip
+  if (shareActionTip && sorted.length > 0) {
+    var tipMap = {
+      "\uD83D\uDE97 Transport": "Try public transport or carpooling 2 days/week to cut commute emissions.",
+      "\uD83C\uDF7D\uFE0F Food": "Swap one meat meal/day with dal or paneer to reduce food emissions.",
+      "\u26A1 Electricity": "Set AC to 24\u00B0C and switch to LED bulbs to cut electricity CO2.",
+      "\u2708\uFE0F Flights": "Take the train for trips under 500km to slash flight emissions."
+    };
+    shareActionTip.textContent = tipMap[sorted[0].label] || "Every small change counts!";
+  }
+}
 // ---------- RESULTS DOM ----------
 var form = document.getElementById("carbon-form");
 var calculatorSection = document.querySelector(".calculator");
@@ -1989,7 +2192,9 @@ var MAX_BAR = 10;
 form.addEventListener("submit", function (e) {
   e.preventDefault();
 
-  var transport = calcCommuteEmission();
+  var vehicleEmission = calcCommuteEmission();
+  var ptEmission = calcPublicTransportEmission();
+  var transport = vehicleEmission + ptEmission;
   var food = calcMealEmission();
   var electricity = calcElecEmission();
   var flights = calcFlightEmission();
@@ -2061,20 +2266,50 @@ form.addEventListener("submit", function (e) {
     cityAltSection.classList.add("hidden");
   }
 
-  // Suggestions
-  var sorted = [
-    { name: "transport", val: transport },
-    { name: "food", val: food },
-    { name: "electricity", val: electricity },
-    { name: "flights", val: flights }
-  ].sort(function (a, b) { return b.val - a.val; });
-  var tips = getTopSuggestions(sorted);
+  // Conditional suggestions (using actual user data)
+  var tips = getConditionalTips(transport, food, electricity, flights);
   suggestionsList.innerHTML = "";
   tips.forEach(function (tip, i) {
     var li = document.createElement("li");
     li.innerHTML = '<span class="suggestion-icon">' + (i + 1) + "</span><span>" + tip + "</span>";
     suggestionsList.appendChild(li);
   });
+
+  // Percentile ranking
+  var indiaBar = document.getElementById("percentile-india-bar");
+  var indiaText = document.getElementById("percentile-india-text");
+  var indiaMarker = document.getElementById("percentile-india-marker");
+  var globalBar = document.getElementById("percentile-global-bar");
+  var globalText = document.getElementById("percentile-global-text");
+  var globalMarker = document.getElementById("percentile-global-marker");
+  var percMax = 10;
+  if (indiaBar && indiaText) {
+    var youPctIndia = Math.min((total / percMax) * 100, 100);
+    indiaBar.style.width = youPctIndia + "%";
+    if (indiaMarker) indiaMarker.style.left = (INDIA_AVG / percMax * 100) + "%";
+    var indiaDiff = ((total - INDIA_AVG) / INDIA_AVG * 100).toFixed(0);
+    if (total <= INDIA_AVG) {
+      indiaText.textContent = Math.abs(indiaDiff) + "% below avg";
+      indiaText.style.color = "#16a34a";
+    } else {
+      indiaText.textContent = indiaDiff + "% above avg";
+      indiaText.style.color = "#f59e0b";
+    }
+  }
+  var GLOBAL_AVG_REAL = 4.7; // actual global avg for percentile (comparison bar uses 4.0)
+  if (globalBar && globalText) {
+    var youPctGlobal = Math.min((total / percMax) * 100, 100);
+    globalBar.style.width = youPctGlobal + "%";
+    if (globalMarker) globalMarker.style.left = (GLOBAL_AVG_REAL / percMax * 100) + "%";
+    var globalDiff = ((total - GLOBAL_AVG_REAL) / GLOBAL_AVG_REAL * 100).toFixed(0);
+    if (total <= GLOBAL_AVG) {
+      globalText.textContent = Math.abs(globalDiff) + "% below avg";
+      globalText.style.color = "#16a34a";
+    } else {
+      globalText.textContent = globalDiff + "% above avg";
+      globalText.style.color = "#f59e0b";
+    }
+  }
 
   // WhatsApp
   var shareText =
