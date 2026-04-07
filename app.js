@@ -1625,114 +1625,11 @@ function calcElecEmission() {
 // ============================================================
 // Solar Panel Calculation Logic
 // ============================================================
-// Solar state — will be wired to HTML inputs in next session
+// Solar state variables
 var solarEnabled = false;
 var solarSystemSize = 0;     // kW
 var solarMonthlyGen = 0;     // kWh generated per month
 var solarMonthlyExport = 0;  // kWh exported to grid per month
-
-// Inject solar UI into the calculator (between Electricity and Flights)
-(function initSolarUI() {
-  var elecResult = document.getElementById("elec-result");
-  if (!elecResult) return;
-  var insertPoint = elecResult.parentElement || elecResult;
-  // Find the flights section label to insert before it
-  var allLabels = document.querySelectorAll(".section-label");
-  var flightsLabel = null;
-  for (var i = 0; i < allLabels.length; i++) {
-    if (allLabels[i].textContent.indexOf("Flights") !== -1) {
-      flightsLabel = allLabels[i];
-      break;
-    }
-  }
-  if (!flightsLabel) return;
-
-  var solarSection = document.createElement("div");
-  solarSection.id = "solar-section";
-  solarSection.innerHTML =
-    '<div class="section-label">\u2600\uFE0F Solar Panels</div>' +
-    '<div class="form-group">' +
-      '<label>Do you have solar panels at home?</label>' +
-      '<div class="toggle-row">' +
-        '<button type="button" class="toggle-btn" id="solar-no-btn">No</button>' +
-        '<button type="button" class="toggle-btn" id="solar-yes-btn">Yes</button>' +
-      '</div>' +
-    '</div>' +
-    '<div id="solar-fields" class="hidden">' +
-      '<div class="form-group">' +
-        '<label for="solar-size">System Size (kW)</label>' +
-        '<input type="number" id="solar-size" min="0" max="50" step="0.5" placeholder="e.g. 3">' +
-        '<small class="input-helper">Most Delhi homes install 3\u20135kW</small>' +
-      '</div>' +
-      '<div class="form-group">' +
-        '<label for="solar-gen">Monthly Units Generated (kWh)</label>' +
-        '<input type="number" id="solar-gen" min="0" max="5000" placeholder="e.g. 350">' +
-        '<small class="input-helper">Check your solar inverter app or net meter</small>' +
-      '</div>' +
-      '<div class="form-group">' +
-        '<label for="solar-export">Units Exported to Grid (kWh/month)</label>' +
-        '<input type="number" id="solar-export" min="0" max="5000" placeholder="e.g. 100">' +
-        '<small class="input-helper">Units sent back to DISCOM \u2014 check net meter reading</small>' +
-      '</div>' +
-      '<div id="solar-result" class="hidden" style="background:#f0fdf4;padding:0.75rem 1rem;border-radius:12px;font-size:0.95rem;margin-bottom:0.5rem;border:2px solid #bbf7d0">' +
-        '<strong style="color:#15803d">\u2600\uFE0F Solar Savings</strong><br>' +
-        'Your solar panels avoid <strong id="solar-savings-kg" style="color:#15803d">0</strong> kg CO2/month' +
-        ' \u2014 equivalent to planting <strong id="solar-trees" style="color:#15803d">0</strong> trees' +
-      '</div>' +
-    '</div>';
-
-  flightsLabel.parentNode.insertBefore(solarSection, flightsLabel);
-
-  var solarYesBtn = document.getElementById("solar-yes-btn");
-  var solarNoBtn = document.getElementById("solar-no-btn");
-  var solarFields = document.getElementById("solar-fields");
-  var solarSizeInput = document.getElementById("solar-size");
-  var solarGenInput = document.getElementById("solar-gen");
-  var solarExportInput = document.getElementById("solar-export");
-  var solarResultEl = document.getElementById("solar-result");
-  var solarSavingsKg = document.getElementById("solar-savings-kg");
-  var solarTreesEl = document.getElementById("solar-trees");
-
-  // Default: No selected
-  solarNoBtn.classList.add("active");
-
-  solarYesBtn.addEventListener("click", function () {
-    solarEnabled = true;
-    solarYesBtn.classList.add("active");
-    solarNoBtn.classList.remove("active");
-    solarFields.classList.remove("hidden");
-  });
-  solarNoBtn.addEventListener("click", function () {
-    solarEnabled = false;
-    solarNoBtn.classList.add("active");
-    solarYesBtn.classList.remove("active");
-    solarFields.classList.add("hidden");
-    solarResultEl.classList.add("hidden");
-    solarSystemSize = 0;
-    solarMonthlyGen = 0;
-    solarMonthlyExport = 0;
-  });
-
-  function updateSolarResult() {
-    solarSystemSize = parseFloat(solarSizeInput.value) || 0;
-    solarMonthlyGen = parseFloat(solarGenInput.value) || 0;
-    solarMonthlyExport = parseFloat(solarExportInput.value) || 0;
-    if (solarMonthlyGen > 0) {
-      var ef = getStateEF();
-      var monthlySavings = (solarMonthlyGen + solarMonthlyExport) * ef;
-      var trees = Math.round(monthlySavings / 1.83);
-      solarSavingsKg.textContent = monthlySavings.toFixed(1);
-      solarTreesEl.textContent = trees;
-      solarResultEl.classList.remove("hidden");
-    } else {
-      solarResultEl.classList.add("hidden");
-    }
-  }
-
-  solarSizeInput.addEventListener("input", updateSolarResult);
-  solarGenInput.addEventListener("input", updateSolarResult);
-  solarExportInput.addEventListener("input", updateSolarResult);
-})();
 
 // Wire up static HTML solar toggles (solar-html-* IDs from index.html)
 (function initStaticSolarHTML() {
