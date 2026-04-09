@@ -1627,7 +1627,6 @@ function calcElecEmission() {
 // ============================================================
 // Solar state variables
 var solarEnabled = false;
-var solarSystemSize = 0;     // kW
 var solarMonthlyGen = 0;     // kWh generated per month
 var solarMonthlyExport = 0;  // kWh exported to grid per month
 
@@ -1657,14 +1656,12 @@ var solarMonthlyExport = 0;  // kWh exported to grid per month
     htmlYes.classList.remove("active");
     if (htmlFields) htmlFields.classList.add("hidden");
     if (htmlResult) htmlResult.classList.add("hidden");
-    solarSystemSize = 0;
     solarMonthlyGen = 0;
     solarMonthlyExport = 0;
   });
 
   function updateStaticSolar() {
     if (!htmlSize || !htmlGen || !htmlExport) return;
-    solarSystemSize = parseFloat(htmlSize.value) || 0;
     solarMonthlyGen = parseFloat(htmlGen.value) || 0;
     solarMonthlyExport = parseFloat(htmlExport.value) || 0;
     if (solarMonthlyGen > 0 && htmlResult && htmlSavingsKg && htmlTrees) {
