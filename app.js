@@ -2221,6 +2221,25 @@ form.addEventListener("submit", function (e) {
   calculatorSection.style.display = "none";
   resultsSection.classList.remove("hidden");
   resultsSection.scrollIntoView({ behavior: "smooth" });
+
+  // Stash latest results for AI advisor
+  window.__lastResults = {
+    total: total,
+    transport: transport,
+    food: food,
+    electricity: electricity,
+    flights: flights
+  };
+  var aiSection = document.getElementById("ai-advisor-section");
+  if (aiSection) {
+    aiSection.style.display = "block";
+    var aiBtn = document.getElementById("get-ai-advice-btn");
+    var aiContainer = document.getElementById("ai-tips-container");
+    var aiLoading = document.getElementById("ai-loading");
+    if (aiBtn) aiBtn.style.display = "block";
+    if (aiContainer) aiContainer.innerHTML = "";
+    if (aiLoading) aiLoading.style.display = "none";
+  }
 });
 
 // ============================================================
@@ -2231,4 +2250,108 @@ recalculateBtn.addEventListener("click", function () {
   cityAltSection.classList.add("hidden");
   calculatorSection.style.display = "block";
   calculatorSection.scrollIntoView({ behavior: "smooth" });
+  var aiSection = document.getElementById("ai-advisor-section");
+  if (aiSection) aiSection.style.display = "none";
 });
+
+// ============================================================
+// AI ADVISOR — personalised plan via Cloudflare Worker
+// ============================================================
+function detectDietType() {
+  var meatItems = ["chicken", "mutton", "fish", "prawn", "beef", "egg", "lamb", "pork"];
+  var slotIds = ["meal-breakfast", "meal-lunch", "meal-snack", "meal-dinner"];
+  for (var i = 0; i < slotIds.length; i++) {
+    var items = (typeof mealSlotItems !== "undefined" && mealSlotItems[slotIds[i]]) || [];
+    for (var j = 0; j < items.length; j++) {
+      var name = (items[j].name || "").toLowerCase();
+      for (var k = 0; k < meatItems.length; k++) {
+        if (name.indexOf(meatItems[k]) !== -1) return "Non-vegetarian";
+      }
+    }
+  }
+  return "Vegetarian";
+}
+
+function getSelectedVehicleLabel() {
+  var brand = document.getElementById("brand");
+  var model = document.getElementById("model");
+  var variant = document.getElementById("variant");
+  var parts = [];
+  if (brand && brand.value) parts.push(brand.value);
+  if (model && model.value) parts.push(model.value);
+  if (variant && variant.value) parts.push(variant.value);
+  return parts.length ? parts.join(" ") : "Not specified";
+}
+
+async function getAIAdvice() {
+  var btn = document.getElementById("get-ai-advice-btn");
+  var loading = document.getElementById("ai-loading");
+  var container = document.getElementById("ai-tips-container");
+
+  btn.style.display = "none";
+  loading.style.display = "flex";
+  container.innerHTML = "";
+
+  var r = window.__lastResults || { total: 0, transport: 0, electricity: 0, food: 0, flights: 0 };
+  var stateSel = document.getElementById("state");
+  var dailyKmInput = document.getElementById("daily-km");
+  var monthlyUnitsInput = document.getElementById("monthly-units");
+
+  var userData = {
+    total: Number(r.total || 0).toFixed(2),
+    transport: Math.round((r.transport || 0) * 1000),
+    vehicle: getSelectedVehicleLabel(),
+    dailyKm: dailyKmInput ? dailyKmInput.value || 0 : 0,
+    electricity: Math.round((r.electricity || 0) * 1000),
+    electricityUnits: monthlyUnitsInput ? monthlyUnitsInput.value || 0 : 0,
+    state: stateSel && stateSel.value ? stateSel.value : "Delhi",
+    food: Math.round((r.food || 0) * 1000),
+    dietType: detectDietType(),
+    flights: Math.round((r.flights || 0) * 1000),
+    flightTrips: (typeof trips !== "undefined" && trips) ? trips.length : 0
+  };
+
+  try {
+    var response = await fetch(
+      "https://carbonx-ai-advisor.singhsarthak70.workers.dev",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData)
+      }
+    );
+    var data = await response.json();
+
+    loading.style.display = "none";
+
+    if (data.tips && data.tips.length > 0) {
+      var icons = {
+        Transport: "🚗",
+        Electricity: "⚡",
+        Food: "🍽️",
+        Flights: "✈️"
+      };
+      container.innerHTML = data.tips.map(function (tip) {
+        var icon = icons[tip.category] || "🌱";
+        return '<div class="ai-tip-card">' +
+          '<div class="ai-tip-icon">' + icon + '</div>' +
+          '<div class="ai-tip-content">' +
+          '<div class="ai-tip-text">' + tip.tip + '</div>' +
+          '<div class="ai-tip-saving">' + tip.saving + '</div>' +
+          '</div></div>';
+      }).join("");
+    } else {
+      btn.style.display = "block";
+    }
+  } catch (error) {
+    loading.style.display = "none";
+    container.innerHTML =
+      '<p class="ai-error">AI advisor temporarily unavailable. Try again.</p>';
+    btn.style.display = "block";
+  }
+}
+
+(function () {
+  var aiBtn = document.getElementById("get-ai-advice-btn");
+  if (aiBtn) aiBtn.addEventListener("click", getAIAdvice);
+})();
