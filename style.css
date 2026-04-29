@@ -124,16 +124,6 @@ nav {
 }
 
 /* FULL-PAGE BACKGROUND CANVASES */
-#bg-particles,
-#fullpage-leaf-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  pointer-events: none;
-}
 
 /* HERO */
 .hero {
@@ -1124,13 +1114,6 @@ footer {
 .food-qty-input:focus {
   outline: none;
   border-color: var(--green-500);
-}
-
-.food-item-co2 {
-  font-size: 0.8rem;
-  color: var(--green-700);
-  font-weight: 600;
-  white-space: nowrap;
 }
 
 .food-remove-btn {
