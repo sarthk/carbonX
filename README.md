@@ -4,7 +4,7 @@ India's most detailed personal carbon
 footprint calculator.
 
 ## Live App
-👉 https://sarthk.github.io/carbonX
+👉 https://www.carbonx.in
 
 ## Features
 - 18 car brands, 77 models, 263 variants
