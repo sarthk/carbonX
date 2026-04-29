@@ -1249,7 +1249,9 @@ var FOOD_DB = [
   ["Dal Tadka", 0.2, "per bowl", "meal"],
   ["Dal Makhani", 0.35, "per bowl", "meal"],
   ["Rajma", 0.25, "per bowl", "meal"],
+  ["Rajma Chawal", 0.3, "per plate", "meal"],
   ["Chole", 0.28, "per bowl", "meal"],
+  ["Chole Bhature", 0.35, "per plate", "meal"],
   ["Paneer Butter Masala", 0.45, "per serving", "meal"],
   ["Shahi Paneer", 0.5, "per serving", "meal"],
   ["Palak Paneer", 0.38, "per serving", "meal"],
@@ -1262,6 +1264,7 @@ var FOOD_DB = [
   ["Mutton Biryani", 0.9, "per serving", "meal"],
   ["Fish Curry", 0.4, "per serving", "meal"],
   ["Prawns", 0.5, "per serving", "meal"],
+  ["Prawns Masala", 0.5, "per serving", "meal"],
   ["Egg Curry", 0.35, "per serving", "meal"],
   ["Egg Biryani", 0.4, "per serving", "meal"],
   ["Veg Biryani", 0.3, "per serving", "meal"],
@@ -1357,9 +1360,9 @@ var mealSlotItems = {
         dropdown.classList.add("hidden");
         return;
       }
-      var maxShow = 8;
-      var shown = 0;
-      // Group by category for display
+      // Show every category in every slot — cap items per category so all 3
+      // groups (Breakfast, Lunch/Dinner, Snack) are reachable from any slot.
+      var maxPerCat = 8;
       var cats = { breakfast: "Breakfast", meal: "Lunch / Dinner", snack: "Snack" };
       var grouped = {};
       matches.forEach(function (f) {
@@ -1368,13 +1371,14 @@ var mealSlotItems = {
         grouped[cat].push(f);
       });
       Object.keys(cats).forEach(function (catKey) {
-        if (!grouped[catKey] || shown >= maxShow) return;
+        if (!grouped[catKey]) return;
         var catLabel = document.createElement("div");
         catLabel.className = "food-dropdown-cat";
         catLabel.textContent = cats[catKey];
         dropdown.appendChild(catLabel);
+        var shownInCat = 0;
         grouped[catKey].forEach(function (f) {
-          if (shown >= maxShow) return;
+          if (shownInCat >= maxPerCat) return;
           var item = document.createElement("div");
           item.className = "food-dropdown-item";
           item.innerHTML = '<span class="food-item-name">' + f[0] + '</span>' +
@@ -1387,7 +1391,7 @@ var mealSlotItems = {
             dropdown.classList.add("hidden");
           });
           dropdown.appendChild(item);
-          shown++;
+          shownInCat++;
         });
       });
       dropdown.classList.remove("hidden");
@@ -2169,7 +2173,10 @@ form.addEventListener("submit", function (e) {
     suggestionsList.appendChild(li);
   });
 
-  // Percentile ranking
+  // Percentile ranking — surface the user's actual number prominently
+  var yourFootprintEl = document.getElementById("your-footprint-value");
+  if (yourFootprintEl) yourFootprintEl.textContent = total.toFixed(1) + "t";
+
   var indiaBar = document.getElementById("percentile-india-bar");
   var indiaText = document.getElementById("percentile-india-text");
   var indiaMarker = document.getElementById("percentile-india-marker");
@@ -2239,6 +2246,7 @@ form.addEventListener("submit", function (e) {
     if (aiBtn) aiBtn.style.display = "block";
     if (aiContainer) aiContainer.innerHTML = "";
     if (aiLoading) aiLoading.style.display = "none";
+    if (typeof bindAIAdviceButton === "function") bindAIAdviceButton();
   }
 });
 
@@ -2284,15 +2292,22 @@ function getSelectedVehicleLabel() {
 }
 
 async function getAIAdvice() {
+  console.log("[CarbonX AI] getAIAdvice() invoked");
   var btn = document.getElementById("get-ai-advice-btn");
   var loading = document.getElementById("ai-loading");
   var container = document.getElementById("ai-tips-container");
+
+  if (!btn || !loading || !container) {
+    console.error("[CarbonX AI] Missing DOM nodes", { btn: !!btn, loading: !!loading, container: !!container });
+    return;
+  }
 
   btn.style.display = "none";
   loading.style.display = "flex";
   container.innerHTML = "";
 
   var r = window.__lastResults || { total: 0, transport: 0, electricity: 0, food: 0, flights: 0 };
+  console.log("[CarbonX AI] Last results:", r);
   var stateSel = document.getElementById("state");
   var dailyKmInput = document.getElementById("daily-km");
   var monthlyUnitsInput = document.getElementById("monthly-units");
@@ -2310,6 +2325,7 @@ async function getAIAdvice() {
     flights: Math.round((r.flights || 0) * 1000),
     flightTrips: (typeof trips !== "undefined" && trips) ? trips.length : 0
   };
+  console.log("[CarbonX AI] POST payload:", userData);
 
   try {
     var response = await fetch(
@@ -2320,7 +2336,9 @@ async function getAIAdvice() {
         body: JSON.stringify(userData)
       }
     );
+    console.log("[CarbonX AI] Response status:", response.status);
     var data = await response.json();
+    console.log("[CarbonX AI] Response body:", data);
 
     loading.style.display = "none";
 
@@ -2341,9 +2359,13 @@ async function getAIAdvice() {
           '</div></div>';
       }).join("");
     } else {
+      console.warn("[CarbonX AI] No tips returned");
+      container.innerHTML =
+        '<p class="ai-error">No suggestions returned. Try again.</p>';
       btn.style.display = "block";
     }
   } catch (error) {
+    console.error("[CarbonX AI] Request failed:", error);
     loading.style.display = "none";
     container.innerHTML =
       '<p class="ai-error">AI advisor temporarily unavailable. Try again.</p>';
@@ -2351,7 +2373,21 @@ async function getAIAdvice() {
   }
 }
 
-(function () {
+// Attach listener once DOM is ready (script is at bottom of body, so DOM exists).
+function bindAIAdviceButton() {
   var aiBtn = document.getElementById("get-ai-advice-btn");
-  if (aiBtn) aiBtn.addEventListener("click", getAIAdvice);
-})();
+  if (!aiBtn) {
+    console.warn("[CarbonX AI] Button not found in DOM");
+    return;
+  }
+  if (aiBtn.dataset.aiBound === "1") return;
+  aiBtn.dataset.aiBound = "1";
+  aiBtn.addEventListener("click", getAIAdvice);
+  console.log("[CarbonX AI] Click listener bound to #get-ai-advice-btn");
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bindAIAdviceButton);
+} else {
+  bindAIAdviceButton();
+}
