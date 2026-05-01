@@ -2342,35 +2342,61 @@ async function getAIAdvice() {
 
     loading.style.display = "none";
 
-    if (data.tips && data.tips.length > 0) {
-      var icons = {
-        Transport: "🚗",
-        Electricity: "⚡",
-        Food: "🍽️",
-        Flights: "✈️"
-      };
-      container.innerHTML = data.tips.map(function (tip) {
-        var icon = icons[tip.category] || "🌱";
-        return '<div class="ai-tip-card">' +
-          '<div class="ai-tip-icon">' + icon + '</div>' +
-          '<div class="ai-tip-content">' +
-          '<div class="ai-tip-text">' + tip.tip + '</div>' +
-          '<div class="ai-tip-saving">' + tip.saving + '</div>' +
-          '</div></div>';
-      }).join("");
+    var tips = extractAITips(data);
+    if (tips.length > 0) {
+      renderAITips(container, tips);
     } else {
-      console.warn("[CarbonX AI] No tips returned");
-      container.innerHTML =
-        '<p class="ai-error">No suggestions returned. Try again.</p>';
-      btn.style.display = "block";
+      console.warn("[CarbonX AI] No tips in API response, using local fallback");
+      renderFallbackTips(container, r);
     }
   } catch (error) {
     console.error("[CarbonX AI] Request failed:", error);
     loading.style.display = "none";
-    container.innerHTML =
-      '<p class="ai-error">AI advisor temporarily unavailable. Try again.</p>';
-    btn.style.display = "block";
+    renderFallbackTips(container, r);
   }
+}
+
+// Normalise various worker response shapes into a uniform tips array.
+function extractAITips(data) {
+  if (!data) return [];
+  var raw = data.tips || data.advice || data.suggestions || data.recommendations;
+  if (!Array.isArray(raw) || raw.length === 0) return [];
+  return raw.map(function (item) {
+    if (typeof item === "string") return { category: "", tip: item, saving: "" };
+    return {
+      category: item.category || item.type || "",
+      tip: item.tip || item.text || item.recommendation || item.advice || "",
+      saving: item.saving || item.impact || item.savings || item.co2 || ""
+    };
+  }).filter(function (t) { return t.tip; });
+}
+
+function renderAITips(container, tips) {
+  var icons = { Transport: "🚗", Electricity: "⚡", Food: "🍽️", Flights: "✈️" };
+  container.innerHTML = tips.map(function (tip) {
+    var icon = icons[tip.category] || "🌱";
+    return '<div class="ai-tip-card">' +
+      '<div class="ai-tip-icon">' + icon + '</div>' +
+      '<div class="ai-tip-content">' +
+      '<div class="ai-tip-text">' + tip.tip + '</div>' +
+      (tip.saving ? '<div class="ai-tip-saving">' + tip.saving + '</div>' : '') +
+      '</div></div>';
+  }).join("");
+}
+
+function renderFallbackTips(container, r) {
+  var localTips = [];
+  try {
+    localTips = getConditionalTips(r.transport || 0, r.food || 0, r.electricity || 0, r.flights || 0);
+  } catch (e) {
+    console.error("[CarbonX AI] Fallback tip generation failed:", e);
+  }
+  if (localTips.length === 0) {
+    container.innerHTML = '<p class="ai-error">No suggestions available right now. Try again later.</p>';
+    return;
+  }
+  var formatted = localTips.map(function (text) { return { category: "", tip: text, saving: "" }; });
+  renderAITips(container, formatted);
 }
 
 // Attach listener once DOM is ready (script is at bottom of body, so DOM exists).
